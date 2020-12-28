@@ -46,7 +46,7 @@ Ginkgo与Go现有的测试基础设施挂钩. 这允许您使用 `go test` 运�
 
 > 这同时意味着 Ginkgo 测试可以和传统 Go `testing`  测试一起使用。`go test` 和 `ginkgo` 都会运行你套件内的所有测试。
 
-### Bootstrapping a Suite
+### 引导套件
 要为一个包写 Ginkgo 测试的话你必须首先初始化一个 Ginkgo 测试套件。比如说你有一个名为 `books` 的包：
 
     $ cd path/to/books
@@ -192,7 +192,7 @@ var _ = Describe("Book", func() {
 
 成功！
 
-### Marking Specs as Failed
+### 将Specs标记为失败
 
 虽然您通常希望使用匹配库（如Gomega）在您的`Spec`中进行断言，但Ginkgo提供了一个简单的全局`Fail`函数，允许您将`Spec`标记为`Fail`。只需调用：
 
