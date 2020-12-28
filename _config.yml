@@ -3,3 +3,5 @@ safe: true
 lsi: false
 highlighter: rouge
 markdown: kramdown
+
+theme: jekyll-theme-minimal
