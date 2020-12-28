@@ -585,7 +585,7 @@ var _ = Describe("Browsing the library", func() {
 
 ---
 
-## The Spec Runner
+## Spec 执行器
 
 ### 待定 Specs
 
