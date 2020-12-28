@@ -1,56 +1,58 @@
 ---
 layout: default
-title: Ginkgo
+title: Ginkgo 中文手册
 ---
-[Ginkgo](https://github.com/onsi/ginkgo) is a Go testing framework built to help you efficiently write expressive and comprehensive tests using [Behavior-Driven Development](https://en.wikipedia.org/wiki/Behavior-driven_development) ("BDD") style.  It is best paired with the [Gomega](https://github.com/onsi/gomega) matcher library but is designed to be matcher-agnostic.
+[Ginkgo](https://github.com/onsi/ginkgo)  是一个 Go 测试框架，旨在帮助你有效地编写富有表现力的全方位测试。
 
-These docs are written assuming you'll be using Gomega with Ginkgo.  They also assume you know your way around Go and have a good mental model for how Go organizes packages under `$GOPATH`.
+与它最匹配的库是 [Gomega](https://github.com/onsi/gomega) ，但它的设计是与匹配器无关的。
 
----
-
-## Support Policy
-
-Ginkgo provides support for versions of Go that are noted by the [Go release policy](https://golang.org/doc/devel/release.html#policy) i.e. N and N-1 major versions.
+这个文档假设你使用 Gomega 的 Ginkgo 。同时也假设你知道 Go 的使用方式并且对于 **$GOPATH** 目录下 Go 如何组织包有一个好的思维模型。
 
 ---
 
-## Getting Ginkgo
+## 版本支持策略
 
-Just `go get` it:
+Ginkgo 提供支持 Go 的版本记录在  [Go 发布策略](https://golang.org/doc/devel/release.html#policy) 比如 N 和 N-1 主版本。
+
+---
+
+## 获取 Ginkgo
+
+使用  `go get` 获取:
 
     $ go get github.com/onsi/ginkgo/ginkgo
     $ go get github.com/onsi/gomega/...
 
-This fetches ginkgo and installs the `ginkgo` executable under `$GOPATH/bin` -- you'll want that on your `$PATH`.
+该命令获取 ginkgo 并且安装  `ginkgo` 可执行文件到  `$GOPATH/bin` – 你需要在你的`$PATH`上配置它。
 
-**Ginkgo is tested against Go v1.6 and newer**
-To install Go, follow the [installation instructions](https://golang.org/doc/install)
+**Ginkgo 要求 Go 版本在 v1.6或以上** 。
+要安装 Go ，请遵从 [安装手册](https://golang.org/doc/install) 。
 
-The above commands also install the entire gomega library. If you want to fetch only the packages needed by your tests, import the packages you need and use `go get -t`. 
+以上命令同时安装了全部 gomega 库。如果你只想安装测试需要的包，导入你需要的包然后使用 `go get -t`。
 
-For example, import the gomega package in your test code:
+例如，导入 gomega 包到你的测试代码：
 
     import "github.com/onsi/gomega"
 
-Use `go get -t` to retrieve the packages referenced in your test code:
+使用 `go get -t  ` 取回你测试代码中引用的包：
 
     $ cd /path/to/my/app
     $ go get -t ./...
 
 ---
 
-## Getting Started: Writing Your First Test
-Ginkgo hooks into Go's existing `testing` infrastructure.  This allows you to run a Ginkgo suite using `go test`.
+##  入门: 第一个测试
+Ginkgo与Go现有的测试基础设施挂钩. 这允许您使用 `go test` 运行Ginkgo套件.
 
-> This also means that Ginkgo tests can live alongside traditional Go `testing` tests.  Both `go test` and `ginkgo` will run all the tests in your suite.
+> 这同时意味着 Ginkgo 测试可以和传统 Go `testing`  测试一起使用。`go test` 和 `ginkgo` 都会运行你套件内的所有测试。
 
 ### Bootstrapping a Suite
-To write Ginkgo tests for a package you must first bootstrap a Ginkgo test suite.  Say you have a package named `books`:
+要为一个包写 Ginkgo 测试的话你必须首先初始化一个 Ginkgo 测试套件。比如说你有一个名为 `books` 的包：
 
     $ cd path/to/books
     $ ginkgo bootstrap
 
-This will generate a file named `books_suite_test.go` containing:
+我们将生成一个名为 `books_suite_test.go` 的文件并包含：
 
 ```go
 package books_test
@@ -67,15 +69,15 @@ func TestBooks(t *testing.T) {
 }
 ```
 
-Let's break this down:
+我们来分析上述代码：
 
-- Go allows us to specify the `books_test` package alongside the `books` package.  Using `books_test` instead of `books` allows us to respect the encapsulation of the `books` package: your tests will need to import `books` and access it from the outside, like any other package.  This is preferred to reaching into the package and testing its internals and leads to more behavioral tests.  You can, of course, opt out of this -- just change `package books_test` to `package books`
-- We import the `ginkgo` and `gomega` packages into the test's top-level namespace by performing a dot-import.  If you'd rather not do this, check out the [Avoiding Dot Imports](#avoiding-dot-imports) section below.
-- `TestBooks` is a `testing` test.  The Go test runner will run this function when you run `go test` or `ginkgo`.
-- `RegisterFailHandler(Fail)`: A Ginkgo test signals failure by calling Ginkgo's `Fail(description string)` function.  We pass this function to Gomega using `RegisterFailHandler`.  This is the sole connection point between Ginkgo and Gomega.
-- `RunSpecs(t *testing.T, suiteDescription string)` tells Ginkgo to start the test suite.  Ginkgo will automatically fail the `testing.T` if any of your specs fail.
+- Go 允许我们在  `books` 包中声明 `books_test` 包。使用 `books_test` 替代 `books` 允许我们遵守 `books` 包的封装性：你的测试将要导入 `books` 并且从外部使用它，就像其他包一样。当让，如果你想要进入包内部来测试它内部组件并进行跟多行为测试的话，你可以选择将 `package books_test`  换成 `package books` 。
+- 我们使用 dot-import 将 `ginkgo` 和 `gomega` 包导入到了顶级命名空间。如果你不想这样做的话，查看下面的 [避免 Dot Imports](#avoiding-dot-imports) 。
+- `TestBooks`  是一个 `testing` 测试.你运行 `go test`  或 `ginkgo` 的时候 Go 测试执行器会执行这个函数。
+- `RegisterFailHandler(Fail)` ： 一个 Ginkgo 测试调用 Ginkgo 的  `Fail(description string)` 函数发出失败信号。我们使用`RegisterFailHandler` 将这个函数传给 Gomega 。这是 Ginkgo 和 Gomega 唯一的连接点。
+- `RunSpecs(t *testing.T, suiteDescription string)` 告诉 Ginkgo 开始这个测试套件。如果任意 specs（说明）失败了，Ginkgo 会自动使 `testing.T` 失败。 
 
-At this point you can run your suite:
+现在你可以运行你的套件：
 
     $ ginkgo #or go test
 
@@ -95,12 +97,13 @@ At this point you can run your suite:
     PASS
     ok      books   0.019s
 
-### Adding Specs to a Suite
-An empty test suite is not very interesting.  While you can start to add tests directly into `books_suite_test.go` you'll probably prefer to separate your tests into separate files (especially for packages with multiple files).  Let's add a test file for our `book.go` model:
+### 添加 Specs 到你的套件
+
+一个空的测试套件不是非常有趣。在你可以开始添加测试到 `books_suite_test.go` 的时候，你很可能偏向把测试放在多个文件中 （特别是有多个文件的包）。我们添加一个测试文件到我们的 `book.go `模型：
 
     $ ginkgo generate book
 
-This will generate a file named `book_test.go` containing:
+这将生成一个名为 `book_test.go` 的文件并包含：
 
 ```go
 package books_test
@@ -115,14 +118,13 @@ var _ = Describe("Book", func() {
 
 })
 ```
+我们来分析上述代码：
 
-Let's break this down:
+- 我们 将 `ginkgo` 和 `gomega` 包导入到顶级命名空间。这样非常方便的同时，也是不必要的。如果你不想这样做的话，查看下面的 [避免 Dot Imports](https://ke-chain.github.io/ginkgodoc/#avoiding-dot-imports) 。
+- 类似的，我们导入 `books` 包因为我们使用特别的 `books_test` 包名用于将测试和代码隔离。方便起见我们导入了 `books` 到命名空间。你可以通过编辑生成的测试文件来选择其它方式。
+- 我们使用 Ginkgo 的 `Describe(text string, body func()) bool` 函数添加了*顶层*描述容器。`var _ = ...` 函数允许我们在顶层给 Describe 赋值 并且不用将它包含在 `func init() {}` 当中。
 
-- We import the `ginkgo` and `gomega` packages into the top-level namespace.  While incredibly convenient, this is not - strictly speaking - necessary.  If youd like to avoid this check out the [Avoiding Dot Imports](#avoiding-dot-imports) section below.
-- Similarly, we import the `books` package since we are using the special `books_test` package to isolate our tests from our code.  For convenience we import the `books` package into the namespace.  You can opt out of either these decisions by editing the generated test file.
-- We add a *top-level* describe container using Ginkgo's `Describe(text string, body func()) bool` function.  The `var _ = ...` trick allows us to evaluate the Describe at the top level without having to wrap it in a `func init() {}`
-
-The function in the `Describe` will contain our specs.  Let's add a few now to test loading books from JSON:
+这个在 `Describe` 函数将包含我们的 specs 。 我们添加一点来从 JSON 加载 books ：
 
 ```go
 var _ = Describe("Book", func() {
@@ -161,15 +163,15 @@ var _ = Describe("Book", func() {
 })
 ```
 
-Let's break this down:
+我们来分析上述代码：
 
-- Ginkgo makes extensive use of closures to allow you to build descriptive test suites.
-- You should make use of `Describe` and `Context` containers to expressively organize the behavior of your code.
-- You can use `BeforeEach` to set up state for your specs.  You use `It` to specify a single spec.
-- In order to share state between a `BeforeEach` and an `It` you use closure variables, typically defined at the top of the most relevant `Describe` or `Context` container.
-- We use Gomega's `Expect` syntax to make expectations on the `CategoryByLength()` method.
+- Ginkgo 使用了大量的闭包使得你可以构建可描述的测试套件。
+- 你应该使用 `Describe` 和 `Context` 容器来富有表现力地组织你代码的行为。
+- 你可使用 `BeforeEach` 为你的 specs 初始化状态。使用 `It` 指定一个 spec。
+- 要在 `BeforeEach` 和 `It` 分享状态的话你可以使用闭包变量，一般声明在 `Describe` 和 `Context` 容器最近的顶层。
+- 我们使用 Gomega 的 `Expect` 语法来对 `CategoryByLength()` 方法执行期望（expectations）。
 
-Assuming a `Book` model with this behavior, running the tests will yield:
+假设一个 `Book` 模型有这些行为，运行这些测试将会成功：
 
     $ ginkgo # or go test
     === RUN TestBootstrap
@@ -188,21 +190,21 @@ Assuming a `Book` model with this behavior, running the tests will yield:
     PASS
     ok      books   0.025s
 
-Success!
+成功！
 
 ### Marking Specs as Failed
 
-While you typically want to use a matcher library, like [Gomega](https://github.com/onsi/gomega), to make assertions in your specs, Ginkgo provides a simple, global, `Fail` function that allows you to mark a spec as failed.  Just call:
+虽然您通常希望使用匹配库（如Gomega）在您的`Spec`中进行断言，但Ginkgo提供了一个简单的全局`Fail`函数，允许您将`Spec`标记为`Fail`。只需调用：
 
 ```go
 Fail("Failure reason")
 ```
 
-and Ginkgo will take care of the rest.
+Ginkgo 将会处理其余的部分。
 
-`Fail` (and therefore Gomega, since it uses fail) will record a failure for the current space *and* panic.  This allows Ginkgo to stop the current spec in its tracks - no subsequent assertions (or any code for that matter) will be called.  Ordinarily Ginkgo will rescue this panic itself and move on to the next test.
+`Fail`(因此 Gomega ，因为它使用 `Fail `)将为当前的 `space`  记录为失败并且 `panic`。这允许Ginkgo停止其轨道中的当前Spec - 没有后续的断言（或者任何那个事件的代码）将被调用。通常情况下，Ginkgo将会补救这个`Panic`本身然后进行下一步测试。
 
-However, if your test launches a *goroutine* that calls `Fail` (or, equivalently, invokes a failing Gomega assertion), there's no way for Ginkgo to rescue the panic that `Fail` invokes.  This will cause the test suite to panic and no subsequent tests will run.  To get around this you must rescue the panic using `GinkgoRecover`.  Here's an example:
+然而，如果你的测试启用了`goroutine`调用`Fail`（或者，等效地，调用失败的 Gomega 断言），Ginkgo 将没有办法补救由 `Fail` 引发的 `Panic.` 这将导致测试套件出现 `Panic `，并且不会运行后续测试。要解决这个问题，你必须使用 `GinkgoRecover `拯救`Panic`。这是一个例子：
 
 ```go
 It("panics in a goroutine", func(done Done) {
@@ -216,32 +218,31 @@ It("panics in a goroutine", func(done Done) {
 })
 ```
 
-Now, if `doSomething()` returns false, Gomega will call `Fail` which will panic but the `defer`red `GinkgoRecover()` will recover said panic and prevent the test suite from exploding.
+现在，如果`doSomething`返回`false`，Gomega将会调用`Fail`,这将会引起`Panic`，但是`defer`的`GinkgoRecover()`将恢复所述`Panic`并防止测试套件爆炸。
 
-More details about `Fail` and about using matcher libraries other than Gomega can be found in the [Using Other Matcher Libraries](#using-other-matcher-libraries) section.
+有关Fail以及使用除Gomega之外的匹配器库的更多详细信息，请参阅[使用其他匹配库](https://ke-chain.github.io/ginkgodoc/#使用其他匹配库)部分
 
-### Logging Output
+## 日志输出
 
-Ginkgo provides a globally available `io.Writer` called `GinkgoWriter` that you can write to.  `GinkgoWriter` aggregates input while a test is running and only dumps it to stdout if the test fails.  When running in verbose mode (`ginkgo -v` or `go test -ginkgo.v`) `GinkgoWriter` always immediately redirects its input to stdout.
+Ginkgo提供了一个全局可用的`io.Writer`，名为`GinkgoWriter`，供您写入。`GinkgoWriter`在测试运行时聚合输入，并且只有在测试失败时才将其转储到`stdout`。当以详细模式运行时（`ginkgo -v`或`go test -ginkgo.v`），`GinkgoWriter`会立即将其输入重定向到`stdout`。
 
-When a Ginkgo test suite is interrupted (via `^C`) Ginkgo will emit any content written to the `GinkgoWriter`.  This makes it easier to debug stuck tests.  This is particularly useful when paired with `--progress` which instruct Ginkgo to emit notifications to the `GinkgoWriter` as it runs through your `BeforeEach`es, `It`s, `AfterEach`es, etc...
+当Ginkgo测试套件中断（通过^ C）时，Ginkgo将发出写入`GinkgoWriter`的任何内容。这样可以更轻松地调试卡住的测试。
+当与`--progress`配对使用时将会特别有用，它指示Ginkgo在运行您的`BeforeEaches`，`Its`，`AfterEaches`等时向GinkgoWriter发出通知。
+## IDE 支持
 
-### IDE Support
+Ginkgo用命令行运行最佳，`ginkgo watch`可以在检测到变化时轻松地在命令行上重新运行测试。
 
-Ginkgo works best from the command-line, and [`ginkgo watch`](#watching-for-changes) makes it easy to rerun tests on the command line whenever changes are detected.
-
-There are a set of [completions](https://github.com/onsi/ginkgo-sublime-completions) available for [Sublime Text](https://www.sublimetext.com/) (just use [Package Control](https://sublime.wbond.net/) to install `Ginkgo Completions`) and for [VSCode](https://code.visualstudio.com/) (use the extensions installer and install vscode-ginkgo).
-
-IDE authors can set the `GINKGO_EDITOR_INTEGRATION` environment variable to any non-empty value to enable coverage to be displayed for focused specs. By default, Ginkgo will fail with a non-zero exit code if specs are focused to ensure they do not pass in CI.
+[Sublime Text](http://www.sublimetext.com/) 有一组 [Completions](https://github.com/onsi/ginkgo-sublime-completions)（仅使用[Package Control](https://packagecontrol.io/)来安装 `Ginkgo Completions` ）和 [VSCode](https://code.visualstudio.com/)（使用扩展安装程序并安装vscode-ginkgo）。
+IDE 作者可以将 `GINKGO_EDITOR_INTEGRATION `环境变量设置为任何非空值，使专注的`Spec`能够显示覆盖范围。默认情况下，如果确定关注的spec不通过CI, Ginkgo 将会Fail，使用非零退出码。
 
 ---
 
-## Structuring Your Specs
+## 构建 Specs
 
-Ginkgo makes it easy to write expressive specs that describe the behavior of your code in an organized manner.  You use `Describe` and `Context` containers to organize your `It` specs and you use `BeforeEach` and `AfterEach` to build up and tear down common set up amongst your tests.
+Ginkgo可以轻松编写富有表现力的 specs，以有条理的方式描述代码的行为。您可以使用`Describe` 和 `Context`容器来组织你的`It` spec，使用 `BeforeEach` 和 `AfterEach` 来搭建和拆除测试中的常见设置。
 
-### Individual Specs: `It`
-You can add a single spec by placing an `It` block within a `Describe` or `Context` container block:
+### 单个 Specs: `It`
+您可以通过在`Describe`或`Context`容器块中设置 It 块来添加单个 spec：
 
 ```go
 var _ = Describe("Book", func() {
@@ -259,13 +260,15 @@ var _ = Describe("Book", func() {
 })
 ```
 
-> `It`s may also be placed at the top-level though this is uncommon.
+> `It` 也可以放在顶层，虽然这种情况并不常见。
 
-#### The `Specify` Alias
+####  `Specify` 别名
 
-In order to ensure that your specs read naturally, the `Specify`, `PSpecify`, `XSpecify`, and `FSpecify` blocks are available as aliases to use in situations where the corresponding `It` alternatives do not seem to read as natural language. `Specify` blocks behave identically to `It` blocks and can be used wherever `It` blocks (and `PIt`, `XIt`, and `FIt` blocks) are used.
+为了确保您的 specs 阅读自然，`Specify`，`PSpecify`，`XSpecify`和`FSpecify`块可用作别名，以便在相应的`It`替代品看起来不像自然语言的情况下使用。
 
-An example of a good substitution of `Specify` for `It` would be the following:
+`Specify`块的行为与`It`块相同，可以在`It`块（以及`PIt`，`XIt`和`FIt`块）的地方使用。
+
+`Specify`替换`It`的示范如下：
 
 ```go
 Describe("The foobar service", func() {
@@ -278,8 +281,9 @@ Describe("The foobar service", func() {
 })
 ```
 
-### Extracting Common Setup: `BeforeEach`
-You can remove duplication and share common setup across tests using `BeforeEach` blocks:
+### 提取通用步骤： `BeforeEach`
+
+您可以使用`BeforeEach`块在多个测试用例中去除重复的步骤以及共享通用的设置：
 
 ```go
 var _ = Describe("Book", func() {
@@ -305,14 +309,12 @@ var _ = Describe("Book", func() {
 })
 ```
 
-The `BeforeEach` is run before each spec thereby ensuring that each spec has a pristine copy of the state.  Common state is shared using closure variables (`var book Book` in this case).  You can also perform clean up in `AfterEach` blocks.
+`BeforeEach`在每个 spec 之前运行，从而确保每个 spec 都具有状态的原始副本。使用闭包变量共享公共状态（在本例中为`var book Book`）。您还可以在`AfterEach`块中执行清理操作。
 
-It is also common to place assertions within `BeforeEach` and `AfterEach` blocks.  These assertions can, for example, assert that no errors occured while preparing the state for the spec.
+在`BeforeEach`和`AfterEach`块中设置断言也很常见。例如，这些断言，可以断言在为 spec 准备状态时没有发生错误。
+### 使用容器来组织 Specs : `Describe` and `Context`
 
-### Organizing Specs With Containers: `Describe` and `Context`
-
-Ginkgo allows you to expressively organize the specs in your suite using `Describe` and `Context` containers:
-
+Ginkgo允许您使用`Describe`和`Context`容器在套件中富有表现力的组织 specs ：
 ```go
 var _ = Describe("Book", func() {
     var (
@@ -368,21 +370,29 @@ var _ = Describe("Book", func() {
 })
 ```
 
-You use `Describe` blocks to describe the individual behaviors of your code and `Context` blocks to exercise those behaviors under different circumstances.  In this example we `Describe` loading a book from JSON and specify two `Context`s: when the JSON parses succesfully and when the JSON fails to parse.  Semantic differences aside, the two container types have identical behavior.
+您可以使用`Describe`块来描述代码的各个行为，`Context`块在不同情况下执行这些行为。在此示例中，我们`Describe`从JSON加载书籍并指定两个`Contexts`：当JSON成功解析时以及JSON无法解析时。除了语义差异，两种容器类型具有相同的行为。
 
-When nesting `Describe`/`Context` blocks the `BeforeEach` blocks for all the container nodes surrounding an `It` are run from outermost to innermost when the `It` is executed.  The same is true for `AfterEach` block though they run from innermost to outermost.  Note: the `BeforeEach` and `AfterEach` blocks run for **each** `It` block.  This ensures a pristine state for each spec.
+当嵌套`Describe`和`Context`块时，`It`执行时，围绕`It`的所有容器节点的`BeforeEach`块，从最外层到最内层运行。
+
+注意：每个`It`块都运行`BeforeEach`和`AfterEach`块。这确保了每个 spec的原始状态。
+
 
 > In general, the only code within a container block should be an `It` block or a `BeforeEach`/`JustBeforeEach`/`JustAfterEach`/`AfterEach` block, or closure variable declarations.  It is generally a mistake to make an assertion in a container block.
 
 > It is also a mistake to *initialize* a closure variable in a container block.  If one of your `It`s mutates that variable, subsequent `It`s will receive the mutated value.  This is a case of test pollution and can be hard to track down.  **Always initialize your variables in `BeforeEach` blocks.**
 
-If you'd like to get information, at runtime about the current test, you can use `CurrentGinkgoTestDescription()` from within any `It` or `BeforeEach`/`JustBeforeEach`/`JustAfterEach`/`AfterEach` block.  The `CurrentGinkgoTestDescription` returned by this call has a variety of information about the currently running test including the filename, line number, text in the `It` block, and text in the surrounding container blocks.
+> 通常，容器块中的唯一代码应该是 `It` 块或 `BeforeEach` / `JustBeforeEach` / `JustAfterEach` / `AfterEach` 块或闭包变量声明。在容器块中进行断言通常是错误的。
+> 在容器块中初始化闭包变量也是错误的。如果你的一个 `It` 改变了这个变量，后期 `It` 将会收到改变后的值。这是一个测试污染的案例，很难追查。**始终在**`BeforeEach`**块中初始化变量。**
 
-### Separating Creation and Configuration: `JustBeforeEach`
+如果您想在运行时获取有关当前测试的信息，您可以在任何`It`或`BeforeEach` / `JustBeforeEach`/`JustAfterEach` / `AfterEach`块中使用`CurrentGinkgoTestDescription()`。
 
-The above example illustrates a common antipattern in BDD-style testing.  Our top level `BeforeEach` creates a new book using valid JSON, but a lower level `Context` exercises the case where a book is created with *invalid* JSON.  This causes us to recreate and override the original book.  Thankfully, with Ginkgo's `JustBeforeEach` blocks, this code duplication is unnecessary.
+此次调用 `CurrentGinkgoTestDescription` 返回包含有关当前运行的测试的各种信息，包括文件名，行号，`It`块中的文本以及周围容器块中的文本。
 
-`JustBeforeEach` blocks are guaranteed to be run *after* all the `BeforeEach` blocks have run and *just before* the `It` block has run.  We can use this fact to clean up the Book specs:
+### 分离创建和配置: `JustBeforeEach`
+
+上面的例子说明了BDD风格测试中常见的反模式。我们的顶级 `BeforeEach` 使用有效的 `JSON` 创建了一个新的 `book` ,但是较低级别的 `Context` 使用无效的JSON创建的 `book` 执行。这使我们重新创建并覆盖原始的 `book` 。幸运的是，使用Ginkgo的 `JustBeforeEach` 块，这些代码重复是不必要的。
+
+`JustBeforeEach` 块保证在所有 `BeforeEach` 块运行之后，并且在 `It` 块运行之前运行。我们可以使用这个特性来清除 `Book` spec：
 
 ```go
 var _ = Describe("Book", func() {
@@ -444,20 +454,18 @@ var _ = Describe("Book", func() {
 })
 ```
 
-Now the actual book creation only occurs once for every `It`, and the failing JSON context can simply assign invalid json to the `json` variable in a `BeforeEach`.
+现在，对每一个`It`，`book`实际上只创建一次。这个失败的`JSON`上下文可以简单地将无效的`json`值分配给`BeforeEach`中的`json`变量。
 
-Abstractly, `JustBeforeEach` allows you to decouple **creation** from **configuration**.  Creation occurs in the `JustBeforeEach` using configuration specified and modified by a chain of `BeforeEach`s.
+抽象地，`JustBeforeEach`允许您将**创建**与**配置**分离。使用由`BeforeEach`链指定和修改的配置在`JustBeforeEach`中进行创建。
 
-> You can have multiple `JustBeforeEach`es at different levels of nesting.  Ginkgo will first run all the `BeforeEach`es from the outside in, then it will run the `JustBeforeEach`es from the outside in.  While powerful, this can lead to confusing test suites -- so use nested `JustBeforeEach`es judiciously.
+> 您可以在不同的嵌套级别使用多个`JustBeforeEach`。Ginkgo将首先从外部运行所有的`BeforeEach`，然后它将从外部运行`JustBeforeEach`。虽然功能强大，但这可能会导致测试套件混乱 - 因此请谨慎使用嵌套的`JustBeforeEach`。
 >
-> Some parting words: `JustBeforeEach` is a powerful tool that can be easily abused.  Use it well.
+> **一些建议：**`JustBeforeEach`**是一个很容易被滥用的强大工具。好好利用它。**
 
-### Separating Diagnostics Collection and Teardown: `JustAfterEach`
 
-It is sometimes useful to have some code which is executed just after each `It` block, but **before** Teardown (which might destroy useful state) - for example to to perform diagnostic operations if the test failed.
+### 分离诊断收集和销毁: `JustAfterEach`
 
-We can use this in the example above to check if the test failed and if so output the actual book:
-
+在销毁（可能会破坏有用的状态）之前，在每一个It块之后，有时运行一些代码是很有用的。比如，测试失败后，执行一些诊断的操作。我们可以在上面的示例中使用它来检查测试是否失败，如果失败，则输出实际的`book`：
 ```go
     JustAfterEach(func() {
         if CurrentGinkgoTestDescription().Failed {
@@ -467,15 +475,17 @@ We can use this in the example above to check if the test failed and if so outpu
     })
 ```
 
-> You can have multiple `JustAfterEach`es at different levels of nesting.  Ginkgo will first run all the `JustAfterEach`es from the inside out, then it will run the `AfterEach`es from the inside out.  While powerful, this can lead to confusing test suites -- so use nested `JustAfterEach`es judiciously.
+> 您可以在不同的嵌套级别使用多个`JustAfterEach`。Ginkgo将首先从内到外运行所有`JustAfterEach`，然后它将从内到外运行`AfterEach`。虽然功能强大，但这会导致测试套件混乱 - 因此合理地使用嵌套的`JustAfterEach`。
 >
-> Like `JustBeforeEach`, `JustAfterEach` is a powerful tool that can be easily abused.  Use it well.
+> **就像**`JustBeforeEach`**一样，**`JustAfterEach `**是一个很容易被滥用的强大工具。好好利用它。**
 
-### Global Setup and Teardown: `BeforeSuite` and `AfterSuite`
+### 全局设置和销毁: `BeforeSuite` and `AfterSuite`
 
-Sometimes you want to run some set up code once before the entire test suite and some clean up code once after the entire test suite.  For example, perhaps you need to spin up and tear down an external database.
+有时您希望在整个测试之前运行一些设置代码和在整个测试之后运行一些清理代码。例如，您可能需要启动并销毁外部数据库。
 
-Ginkgo provides `BeforeSuite` and `AfterSuite` to accomplish this.  You typically define these at the top-level in the bootstrap file.  For example, say you need to set up an external database:
+Ginkgo提供了`BeforeSuite`和`AfterSuite`来实现这一点。通常，您可以在引导程序文件的顶层定义它们。例如，假设您需要设置外部数据库：
+
+
 
 ```go
 package books_test
@@ -514,19 +524,19 @@ var _ = AfterSuite(func() {
 })
 ```
 
-The `BeforeSuite` function is run before any specs are run.  If a failure occurs in the `BeforeSuite` then none of the specs are run and the test suite ends.
+`BeforeSuite` 函数在任何 spec运行之前运行。如果`BeforeSuite`运行失败则没有 spec将会运行，测试套件运行结束。
 
-The `AfterSuite` function is run after all the specs have run, regardless of whether any tests have failed.  Since the `AfterSuite` typically includes code to clean up persistent state ginkgo will *also* run `AfterSuite` when you send the running test suite an interrupt signal (`^C`).  To abort the `AfterSuite` send another interrupt signal.
+`AfterSuite`函数在所有的 spec运行之后运行，无论是否有任何测试的失败。由于`AfterSuite`通常有一些代码来清理持久的状态，所以当你使用`control+c` 打断运行的测试时，Ginkgo也将会运行`AfterSuite`。要退出`AfterSuite`的运行，再次输入`control+c`。
 
-Both `BeforeSuite` and `AfterSuite` can be run asynchronously by passing a function that takes a `Done` parameter.
+通过传递带有Done参数的函数，可以异步运行`BeforeSuite`和`AfterSuite`。
 
-You are only allowed to define `BeforeSuite` and `AfterSuite` *once* in a test suite (you shouldn't need more than one!)
+您只能在测试套件中定义一次`BeforeSuite`和`AfterSuite`（**不需要设置多次**！）
 
-Finally, when running in parallel, each parallel process will run `BeforeSuite` and `AfterSuite` functions.  [Look here](#parallel-specs) for more on running tests in parallel.
+最后，当并行运行时，每个并行进程都将运行`BeforeSuite`和`AfterSuite`函数。在[这里](#并行 specs)查看有关并行运行测试的更多信息。
 
-### Documenting Complex `It`s: `By`
+### 记录复杂的`It`: `By`
 
-As a rule, you should try to keep your `It`s, `BeforeEach`es, etc. short and to the point.  Sometimes this is not possible, particularly when testing complex workflows in integration-style tests.  In these cases your test blocks begin to hide a narrative that is hard to glean by looking at code alone.  Ginkgo provides `by` to help in these situations.  Here's a hokey example:
+按照规则，您应该记录您的`It`，`BeforEach`， 等精炼到位。有时这是不可能的，特别是在集成式测试中测试复杂的工作流时。在这些情况下，您的测试块开始隐藏通过单独查看代码难以收集的叙述。在这些情况下，Ginkgo 通过`By`来提供帮助。这里有一个很好的例子：
 
 ```go
 var _ = Describe("Browsing the library", func() {
@@ -569,17 +579,18 @@ var _ = Describe("Browsing the library", func() {
 })
 ```
 
-The string passed to `By` is emitted via the [`GinkgoWriter`](#logging-output).  If a test succeeds you won't see any output beyond Ginkgo's green dot.  If a test fails, however, you will see each step printed out up to the step immediately preceding the failure.  Running with `ginkgo -v` always emits all steps.
+传递给By的字符串是通过[`GinkgoWriter`](#日志输出)发出的。如果测试成功，您将看不到Ginkgo绿点之外的任何输出。但是，如果测试失败，您将看到失败之前的每个步骤的打印输出。使用`ginkgo -v`总是输出所有步骤打印。
 
-`By` takes an optional function of type `func()`.  When passed such a function `By` will immediately call the function.  This allows you to organize your `It`s into groups of steps but is purely optional.  In practice the fact that each `By` function is a separate callback limits the usefulness of this approach.
+`By` 采用一个可选的`fun()`类型函数。当传入这样的一个函数时，`By`将会立刻调用该函数。这将允许您组织您的多个`It`到一组步骤，但这纯粹是可选的。在实际应用中，每个`By`函数是一个单独的回调，这一特性限制了这种方法的可用性。
 
 ---
 
 ## The Spec Runner
 
-### Pending Specs
+### 待定 Specs
 
-You can mark an individual spec or container as Pending.  This will prevent the spec (or specs within the container) from running.  You do this by adding a `P` or an `X` in front of your `Describe`, `Context`, `It`, and `Measure`:
+您可以将单个`Spec`或容器标记为待定。这将阻止`Spec`（或者容器中的`Specs`）运行。您可以在您的`Describe`, `Context`, `It` 和 `Measure`前面添加一个`P`或者一个`X`来实现这一点：
+
 
 ```go
 PDescribe("some behavior", func() { ... })
@@ -593,13 +604,13 @@ XIt("some assertion")
 XMeasure("some measurement")
 ```
 
-> You don't need to remove the `func() { ... }` when you mark an `It` or `Measure` as pending.  Ginkgo will happily ignore any arguments after the string.
+> 当您标记一个`It`或者`Meature`为`Pending`态时，您不必删掉`fun() {...}`。 Ginkgo 会自动忽略字符串后面的任何参数。
 
-> By default, Ginkgo will print out a description for each pending spec.  You can suppress this by setting the `--noisyPendings=false` flag.
+> 默认，Ginkgo将会打出每一个处于`Pending`态的`Spec`的说明。您可以通过设置`--noisyPendings=false`标签来关闭它。
 
-> By default, Ginkgo will not fail a suite for having pending specs.  You can pass the `--failOnPending` flag to reverse this behavior.
+> 默认，Ginkgo不会因为有处于`Pending`态的 spec而导致失败。您可以通过设置`--failOnPending`标签来改变它。
 
-Using the `P` and `X` prefixes marks specs as pending at compile time.  If you need to skip a spec at *runtime* (perhaps due to a constraint that can only be known at runtime) you may call `Skip` in your test:
+在编译时，使用`P`和`X`将 spec标记为`Pending`态。如果您需要在运行时（可能是由于只能在运行时才知道约束）跳过一个 spec。您可以在您的测试中调用`Skip`：
 
 ```go
 It("should do something, if it can", func() {
@@ -610,31 +621,30 @@ It("should do something, if it can", func() {
     // assertions go here
 })
 ```
+> 默认地，Ginkgo将会为每一个跳过的 spec打印输出一份说明。您可以通过设置`--noisySkippings=false`标签来关闭它。
 
-> By default, Ginkgo will print out a description for each skipped spec.  You can suppress this by setting the `--noisySkippings=false` flag.
+注意：`Skip(...)`导致闭包退出，所以没有必要返回它。
 
-Note that `Skip(...)` causes the closure to exit so there is no need to return.
+### 聚焦 Specs
 
-### Focused Specs
+当开发的时候，运行 spec的子集将会非常方便。Ginkgo有两种机制可以让您专注于特定 spec：
 
-It is often convenient, when developing to be able to run a subset of specs.  Ginkgo has two mechanisms for allowing you to focus specs:
-
-1. You can focus individual specs or whole containers of specs *programatically* by adding an `F` in front of your `Describe`, `Context`, and `It`:
+1. 您可以在`Descirbe`, `Context` 和 `It`前面添加F以编程方式专注于单个 spec或者整个容器的 spec：
     ```go
     FDescribe("some behavior", func() { ... })
     FContext("some scenario", func() { ... })
     FIt("some assertion", func() { ... })
     ```
 
-    doing so instructs Ginkgo to only run those specs.  To run all specs, you'll need to go back and remove all the `F`s.
+   这样做是为了指示Ginkgo只运行这些 spec。要运行所有 spec，您需要退回去并删除所有的 `F`。
 
-2. You can pass in a regular expression with the `--focus=REGEXP` and/or `--skip=REGEXP` flags.  Ginkgo will only run specs that match the focus regular expression and don't match the skip regular expression.
+2. 您可以使用`--focus = REGEXP`和/或`--skip = REGEXP`标签来传递正则表达式。Ginkgo只运行 `focus` 正则表达式匹配的 spec，不运行`skip`正则表达式匹配的 spec。
 
-3. In cases where specs dont provide enough hierarchichal distinction between groups of tests, directories can be included in the matching of `focus` and `skip`, via the `--regexScansFilePath` option.  That is, if the original code location for a test is `test/a/b/c/my_test.go`, one can combine `--focus=/b/` along with `--regexScansFilePath=true` to focus on tests including the path `/b/`.  This feature is useful for filtering tests in binary artifacts along the lines of the original directory where those tests were created - but ideally your specs should be organized in such a way as to minimize the need for using this feature.
+3. 为了防止 spec不能在测试组之间提供足够的等级区分，可以通过`--regexScansFilePath`选项，将目录加载到`focus`和`skip`的匹配中。也就是说，如果测试的初始代码位置是`test/a/b/c/my_test.go`，可以将`--focus=/b/`和`--regexScansFilePath=true`结合起来，专注于包含路径`/b/`的测试。此功能对于在创建这些测试的原始目录的行中过滤二进制工件中的测试是十分有用的。但理想情况下，您应该遵循最大限度地减少使用此功能的需求来组织您的 spec。
 
-When Ginkgo detects that a passing test suite has a programmatically focused test it causes the suite to exit with a non-zero status code.  This is to help detect erroneously committed focused tests on CI systems.  When passed a command-line focus/skip flag Ginkgo exits with status code 0 - if you want to focus tests on your CI system you should explicitly pass in a -focus or -skip flag.
+当Ginkgo检测到以编程式为测试中心的测试组件时，它将以非零状态码退出。这有助于检测CI系统上错误提交的重点测试。当传入命令行`focus`/`skip`标志时，Ginkgo以`0`状态码退出。如果要将测试集中在CI系统上，则应该显示地传入`-focus`或`-skip`标志。
 
-Nested programmatically focused specs follow a simple rule: if a leaf-node is marked focused, any of its ancestor nodes that are marked focus will be unfocused.  With this rule, sibling leaf nodes (regardless of relative-depth) that are focused will run regardless of the focus of a shared ancestor; and non-focused siblings will not run regardless of the focus of the shared ancestor or the relative depths of the siblings.  More simply:
+嵌套的以编程方式为重点的 spec遵循一个简单的规则：如果叶子节点被标记为重点，那么它的被标记为重点的任何根结点将变为非重点。根据这个规则，标记为重点的兄弟叶子节点（无论相对深度如何），将会运行无论共享的根结点是否是重点；非重点的兄弟节点将不会运行无论共享的根结点或者相对深度的兄弟姐妹是否是重点。更简单地：
 
 ```go
 FDescribe("outer describe", func() {
@@ -652,61 +662,60 @@ FDescribe("outer describe", func() {
 })
 ```
 
-will only run `B`.  This behavior tends to map more closely to what the developer actually intends when iterating on a test suite.
+只会运行`B`，这种行为倾向于更紧密地反应开发人员在测试套件上进行迭代时的实际意图。
 
-> The programatic approach and the `--focus=REGEXP`/`--skip=REGEXP` approach are mutually exclusive.  Using the command line flags will override the programmatic focus.
+> 程序化方法和`--focus=REGEXP`/`--skip=REGEXP`方法是互斥的。使用命令行标志将覆盖程序化的重点。
 
-> Focusing a container with no `It` or `Measure` leaf nodes has no effect.  Since there is nothing to run in the container, Ginkgo effectively ignores it.
+> 专注于没有`It`或者`Measure`的叶子节点的容器是没有意义的。由于容器中没有任何东西可以运行，因此实际上，Ginkgo忽略了它。
 
-> When using the command line flags you can specify one or both of `--focus` and `--skip`.  If both are specified the constraints will be `AND`ed together.
+> 使用命令行标志时，您可以指定`--focus`和`--skip`中的一个或两个。如果都指定了，则他们的限制将都会生效。
 
-> You can unfocus programatically focused tests by running `ginkgo unfocus`.  This will strip the `F`s off of any `FDescribe`, `FContext`, and `FIt`s that your tests in the current directory may have.
+> 您可以通过运行`ginkgo unfocus`来取消以编程为中心的测试的关注。这将从您当前目录中可能具有任何`FDescribe`，`FContext`和`FIt`的测试中删除`F`。
 
-> If you want to skip entire packages (when running `ginkgo` recursively with the `-r` flag) you can pass a comma-separated list  to `--skipPackage=PACKAGES,TO,SKIP`.  Any packages with *paths* that contain one of the entries in this comma separated list will be skipped.
+> 如果你想跳过整个包（当使用`-r`标志递归运行`ginkgo`时），你可以将逗号分隔的列表传递给`--skipPackage = PACKAGES, TO, SKIP`。包含列表中目录的任何包都将会被忽略。
 
-### Spec Permutation
+### Spec 序列
 
-By default, Ginkgo will randomize the order in which your specs are run.  This can help suss out test pollution early on in a suite's development.
+默认情况下，Ginkgo 会将你 specs 的运行顺序打乱。这样有助于你在开发测试套件时及早发现测试污染。
 
-Ginkgo's default behavior is to only permute the order of top-level containers -- the specs *within* those containers continue to run in the order in which they are specified in the test file.  This is helpful when developing specs as it mitigates the coginitive overload of having specs continuously change the order in which they run.
+Ginkgo 的默认只会变换顶级容器的顺序，那些容器中的 specs 则继续依照测试文件中指定的顺序运行。这样有助于减轻开发时 specs 不断变换运行顺序时的理解难度。
 
-To randomize *all* specs in a suite, you can pass the `--randomizeAllSpecs` flag.  This is useful on CI and can greatly help fight the scourge of test pollution.
+想要让套件中所有 specs 随机的话，你可以传入 `--randomizeAllSpecs` 参数。这在 CI （持续集成）和防止测试污染时很有用。
 
-Ginkgo uses the current time to seed the randomization.  It prints out the seed near the beginning of the test output.  If you notice test intermittent test failures that you think may be due to test pollution, you can use the seed from a failing suite to exactly reproduce the spec order for that suite.  To do this pass the `--seed=SEED` flag.
+Ginkgo 使用当前时间作为随机种子。种子的值会被打印在测试输出的起始位置附件。如果你发现测试出现间歇性的错误，并且你认为可能是测试污染引起的，你可以使用失败套件的种子来准确的重现套件的运行顺序。传递参数`--seed=SEED`即可。
+当你运行多个 spec 套件时，Ginkgo 默认按照文件系统排列的顺序来执行套件。你可以通过命令 `ginkgo --randomizeSuites` 来改变套件的顺序。
 
-When running multiple spec suites Ginkgo defaults to running the suites in the order they would be listed on the file-system.  You can permute the suites by passing `ginkgo --randomizeSuites`
+### 并行 Specs
 
-### Parallel Specs
+Ginkgo 支持并行运行 specs 。它的实现方式是大量产生 `go test` 进程并且通过一个共享队列为每个进程提供 specs 。这对于一个 BDD 测试框架非常重要，因为闭包的共享内容(context)在并发中容易出错。
 
-Ginkgo has support for running specs in parallel.  It does this by spawning separate `go test` processes and serving specs to each process off of a shared queue.  This is important for a BDD test framework, as the shared context of the closures does not parallelize well in-process.
-
-To run a Ginkgo suite in parallel you *must* use the `ginkgo` CLI.  Simply pass in the `-p` flag:
+要并发运行 Ginkgo 套件的话你必须使用 `ginkgo` CLI。只需要传递`-p` 参数：
 
     ginkgo -p
 
-this will automatically detect the optimal number of test nodes to spawn (see the note below).
+它将自动检测需要生成测试节点的最佳个数（请看下面的注释）。
 
-To specify the number of nodes to spawn, use `-nodes`:
+如要指定生成的节点数，使用 `-nodes` ：
 
     ginkgo -nodes=N
 
-> You do not need to specify both `-p` and `-nodes`.  Setting `-nodes` to anything greater than 1 implies a parallelized test run.
+> 你不需要同时指定 `-p` 和 `-nodes `。设置任何大于1的 `-nodes`  都意味着执行并发测试。
 
-> The number of nodes used with `-p` is `runtime.NumCPU()` if `runtime.NumCPU() <= 4`, otherwise it is `runtime.NumCPU() - 1` based on a rigorous science based heuristic best characterized as "my gut sense based on a few months of experience"
+> 使用 `-p`  时节点的数量时如果 `runtime.NumCPU() <= 4`则 `runtime.NumCPU()` ，否则就是 `runtime.NumCPU() - 1` ，这是基于严格的启发式科学就跟“几个月经验养成的直觉”一样。
 
-The test runner collates output from the running processes into one coherent output.  This is done, under the hood, via a client-server model: as each client suite completes a test, the test output and status is sent to the server which then prints to screen.  This collates the output of simultaneous test runners to one coherent (i.e. non-interleaved), aggregated, output.
+测试执行器整理运行中进程的输出统一放入一个连续的输出中。这背后的机制是客户端-服务端模型：当每个客户端套件完成一个测试，测试输出和状态会被发送给服务端，服务端收到后打印到屏幕。这将同时运行的测试输出整理到一个连续的(既无间隔的)，聚合的输出中。
 
-It is sometimes necessary/preferable to view the output of the individual parallel test suites in real-time.  To do this you can set `-stream`:
+有时候需要或更想要实时查看单个并行套件的输出。你可以设置`-stream`：
 
     ginkgo -nodes=N -stream
 
-When run with the `-stream` flag the test runner simply pipes the output from each individual node as it runs (it prepends each line of output with the node # that the output came from).  This results in less coherent output (lines from different nodes will be interleaved) but can be valuable when debugging flakey/hanging test suites.
+使用 `-stream` 参数运行测试的时候，执行器直接输出各自运行节点的日志（它会在每行开头预置输出的节点 id）。这种结果缺少连续输出（来自不同节点的日志交叉在一起），但是在调试古怪的或者待定的测试套件的时候会有用。
 
-> On windows, parallel tests default to `-stream` because Ginkgo can't capture logging to stdout/stderr (necessary for aggregation) on windows.
+> 在 windows 系统中，并行测试默认带有 `-stream` 因为Ginkgo 不能捕获日志到 stdout/stderr  (对于聚合必要)。
 
-#### Managing External Processes in Parallel Test Suites
+#### 并发测试套件管理外部进程
 
-If your tests spin up or connect to external processes you'll need to make sure that those connections are safe in a parallel context.  One way to ensure this would be, for example, to spin up a separate instance of an external resource for each Ginkgo process.  For example, let's say your tests spin up and hit a database.  You could bring up a different database server bound to a different port for each of your parallel processes:
+如果你启动或者连接到外部进程，你要确保那些连接在并行环境（context）下是安全的。一种方法是为每一个 Ginkgo 进程启动一个单独外部资源的实例。举个例子，比如说你要启动并连接一个数据库。你可以启动不同数据库服务并绑定到并行进程的对应端口：
 
 ```go
 package books_test
@@ -750,17 +759,17 @@ var _ = AfterSuite(func() {
 ```
 
 
-The `github.com/onsi/ginkgo/config` package provides your suite with access to the command line configuration parameters passed into Ginkgo.  The `config.GinkgoConfig.ParallelNode` parameter is the index for the current node (starts with `1`, goes up to `N`).  Similarly `config.GinkgoConfig.ParallelTotal` is the total number of nodes running in parallel.
+ `github.com/onsi/ginkgo/config`  包为你的套件提供了获取传入 Ginkgo 命令行配置参数的能力。 `config.GinkgoConfig.ParallelNode` 参数是当前节点的索引（从1开始，到 N ）。类似的  `config.GinkgoConfig.ParallelTotal`  是运行中并行节点的总数。
 
-#### Managing *Singleton* External Processes in Parallel Test Suites
+#### 并发套件管理单个外部进程
 
-When possible, you should make every effort to start up a new instance of an external resource for every parallel node.  This helps avoid test-pollution by strictly separating each parallel node.
+可以的话，你应该尽可能为每个并行节点新建一个外部资源的实例。这样严格隔离每个并行节点有助于避免测试污染。
 
-Sometimes (rarely) this is not possible.  Perhaps, for reasons beyond your control, you can only start one instance of a service on your machine.  Ginkgo provides a workaround for this with `SynchronizedBeforeSuite` and `SynchronizedAfterSuite`.
+有时候（罕见的）这样是行不通的。也许，在你控制之外的原因，你在自己机器上只能开启一个服务实例。Ginkgo 提供了替代方案`SynchronizedBeforeSuite` 和 `SynchronizedAfterSuite`。
 
-The idea here is simple.  With `SynchronizedBeforeSuite` Ginkgo gives you a way to run some preliminary setup code on just one parallel node (Node 1) and other setup code on all nodes.  Ginkgo synchronizes these functions and guarantees that node 1 will complete its preliminary setup before the other nodes run their setup code.  Moreover, Ginkgo makes it possible for the preliminary setup code on the first node to pass information on to the setup code on the other nodes.
+原理很简单。 `SynchronizedBeforeSuite` 使 Ginkgo 可以让你只在一个并行节点运行准备工作的初始化代码，其它初始化代码则全部节点都运行。Ginkgo 同步了这些方法并保证节点 1 会在其它节点运行初始化代码前运行准备工作的初始化代码。此外，Ginkgo 能使运行在节点1 准备工作的初始化代码传递信息给其它节点运行初始化代码。
 
-Here's what our earlier database example looks like using `SynchronizedBeforeSuite`:
+这是我们早些的使用`SynchronizedBeforeSuite` 的数据库案例：
 
 ```go
 var _ = SynchronizedBeforeSuite(func() []byte {
@@ -780,9 +789,9 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 })
 ```
 
-`SynchronizedBeforeSuite` must be passed two functions.  The first must return `[]byte` and the second must accept `[]byte`.  When running with multiple nodes the *first* function is only run on node 1.  When this function completes, all nodes (including node 1) proceed to run the *second* function and will receive the data returned by the first function.  In this example, we use this data-passing mechanism to forward the database's address (set up on node 1) to all nodes.
+`SynchronizedBeforeSuite` 必须传入两个函数。第一个必须返回`[]byte`并且第二个必须接受`[]byte`。当运行多节点的时候，第一个函数只在节点 1 运行。一个函数结束后，所有节点（包括节点1）继续运行第二个函数并且会接受第一个函数返回的数据。这个例子中，我们使用数据传输机制使用数据库的地址（在节点1初始化）传给所有节点。
 
-To clean up correctly, you should use `SynchronizedAfterSuite`.  Continuing our example:
+为了正确清理，你应该使用 `SynchronizedAfterSuite`。继续我们的案例：
 
 ```go
 var _ = SynchronizedAfterSuite(func() {
@@ -792,26 +801,25 @@ var _ = SynchronizedAfterSuite(func() {
 })
 ```
 
-With `SynchronizedAfterSuite` the *first* function is run on *all* nodes (including node 1).  The *second* function is only run on node 1.  Moreover, the second function is only run when all other nodes have finished running.  This is important, since node 1 is responsible for setting up and tearing down the singleton resources it must wait for the other nodes to end before tearing down the resources they depend on.
+使用 `SynchronizedAfterSuite` 的话，第一个函数会在所有节点（包括节点1）运行。第二个函数只会在节点1 运行。此外，第二个函数只会在其它节点都运行结束的情况下运行。这很重要，因为节点 1 负责初始化和销毁单例资源，它必须等待其它节点结束才能销毁其它节点依赖的资源。
 
-Finally, all of these function can be passed an additional `Done` parameter to run asynchronously.  When running asynchronously, an optional timeout can be provided as a third parameter to `SynchronizedBeforeSuite` and `SynchronizedAfterSuite`.  The same timeout is applied to both functions.
+最后，所有这些函数都能传入一个惯用的`Done`参数用于异步运行。当异步运行的时候，一个可选的超时能作为第三个传入`SynchronizedBeforeSuite` 和 `SynchronizedAfterSuite`的参数。
 
-> Note an important subtelty:  The `dbRunner` variable is *only* populated on Node 1.  No other node should attempt to touch the data in that variable (it will be nil on the other nodes).  The `dbClient` variable, which is populated in the second `SynchronizedBeforeSuite` function is, of course, available across all nodes.
+> 请注意一个微妙之处： `dbRunner`变量值存在与节点1。其它节点都不应该试图使用该变量中的数据（其他节点上为空）。`dbClient`变量只会存在于`SynchronizedBeforeSuite`函数，当然，所有节点都能用。
 
 ---
 
-## Understanding Ginkgo's Lifecycle
+## 理解 Ginkgo 的生命周期
 
-Users of Ginkgo sometimes get tripped up by Ginkgo's lifecycle.  This section provides a mental model to help you reason about what code runs when.
+Ginkgo 的使用者有时候在 Ginkgo 的生命周期上犯错误。这个章节提供了一个思维模型来帮助你理解什么代码在什么时候运行。
 
-Ginkgo endeavors to carefully control the order in which specs run and provides seamless support for running a given test suite in parallel across [multiple processes](#parallel-specs).  To accomplish this, Ginkgo needs to know a suite's entire testing tree (i.e. the nested set of `Describe`s, `Context`s, `BeforeEach`es, `It`s, etc.) **up front**.  Ginkgo uses this tree to construct an ordered, ([deterministically randomized](#spec-permutation)), list of tests to run.
+Ginkgo 致力于谨慎地控制 specs 的运行顺序，并且对运行中 [多进程](https://onsi.github.io/ginkgo/#parallel-specs)的并行测试套件提供无缝的支持。为了完成这些，Ginkgo 需要**预先**知道测试套件的整个测试树（比如`Describe`s, `Context`s, `BeforeEach`es, `It`s,等的嵌套结构）。Ginkgo 使用这个树来构造序列，（[伪随机](https://onsi.github.io/ginkgo/#spec-permutation)），运行的测试列表。
 
-This means that all the tests must be defined _before_ Ginkgo can run the suite.  Once the suite is running it is an error to attempt to define a new test (e.g. calling `It` within an existing `It` block).
+这意味着所有这些测试必须在 Ginkgo 运行套件*前*都定义好。因为在套件运行的时候，尝试定义一个新的测试会出现错误（例如在 `It` 块中调用 `It`）。
 
-Of course, it is still possible (in fact, common) to dynamically generate test suites based on configuration.  However you must generate these tests _at the right time_ in the Ginkgo lifecycle.  This nuance sometimes trips users up.
+当让，根据配置动态生成测试套件也是可行的（实际上经常这样）。但是 Ginkgo 生命周期中你必须*在正确的时间*生成测试。这些细微差别有时候让用户犯错。
 
-Let's look at a typical Ginkgo test suite.  What follows is a test suite for a `books` package that spans multiple files:
-
+我们来卡一下典型的 Ginkgo 测试套件。跟在测试套件后面的是一个多文件的 books 包：
 
 ```go
 // books_suite_test.go
@@ -905,30 +913,34 @@ var _ = Describe("Looking up ISBN numbers", func() {                            
 })                                                                                                     // L40
 ```
 
-Here's what happens when this test is run via the `ginkgo` cli, in order:
+当你运行 `ginkgo` cli 的时候，按顺序发生了下面这些事：
 
-1. `ginkgo` runs `go test -c` to compile the test binary
-2. `ginkgo` launches the test binary (this is equivalent to simply running `go test` but gives Ginkgo the ability to launch multiple test processes without paying the cost of repeat compilation)
-3. The test binary loads into memory and all top-level functions are defined and invoked.  Specifically, that means:
-    1. The `TestBooks` function is defined (Line `L1`)
-    2. The `Describe` at `L5` is invoked and passed in the string "When reading a book", and the anonymous function that contains the tests nested in this describe.
-    3. The `Describe` at `L27` is invoked and passed in the string "Looking up ISBN numbers", and the anonymous function that contains the tests nested in this describe.
+当你运行 `ginkgo` cli 的时候，按顺序发生了下面这些事：
 
-    Note that the anonymous functions passed into the `Describe`s are *not* invoked at this time.  At this point, Ginkgo simply knows that there are two top-level containers in this suite.
-4. The `go test` runtime starts running tests by invoking `TestBooks()` (`L1`)
-5. Ginkgo's `Fail` handler is registered with `gomega` via `RegisterFailHandler` (`L2`) - this is necessary because `ginkgo` and `gomega` are not tightly coupled and alternative matcher libraries can be used with Ginkgo.
-6. `RunSpecs` is called (`L3`).  This does a number of things:
-    
-    **Test Tree Construction Phase**:
-    1. Ginkgo iterates through every top-level container(i.e. the two `Describe`s at `L5` and `L27`) and invokes their anonymous functions.
-    2. When the function at `L5` is invoked it:
-        - Defines a closure variable named `book` (`L6`)
-        - Registers a `BeforeEach` passing it an anonymous function (`L7`).  This function is registered and saved as part of the testing tree and **is not run yet**.
-        - Registers an `It` with a description and anonymous function. (`L12`).  This function is registered and saved as part of the testing tree and **is not run yet**.
-        - Adds a nested `Context` (`L17`).  The anonymous function passed into the `Context` is **immediately** invoked to continue building the tree.  This registers the `It` at line `L18`.
-        - At this point the anonymous function at `L5` exists **and is never called again**.
-    3. The function for the next top-level describe at `L27` is also invoked, and behaves similarly.
-    4. At this point all top-level containers have been invoked and the testing tree looks like:
+1. `ginkgo `运行  `go test -c `来编译测试二进制文件
+2. `ginkgo` 启动测试二进制文件（这相当于直接运行 `go test`  ，但是 Ginkgo 如果还要运行多进程测试的话，就不需要重新编译了）
+3. 加载测试二进制文件到内存并且定义和调用顶层函数。准确点说，则意味着：
+   1. `TestBooks` 函数已经被定义（行 `L1`）
+   2. 行`L5` 的 `Describe`被调用并且传入了字符串“When reading a book”,还有包含测试的匿名函数嵌入到了`Describe`中。
+   3. 
+      行`L27`的 `Describe`被调用并且传入了字符串“Looking up ISBN numbers”,还有包含测试的匿名函数嵌入到了`Describe`中。
+
+   注意传入`Describe` 的匿名函数现在还没被调用。这个时间点，Ginkgo 只是知道了套件有两个顶层容器。
+4.  `go test` 运行时调用`TestBooks()` 开始执行测试(`L1`)
+5. Ginkgo 的 `Fail` 句柄（ handler ）通过`RegisterFailHandler` (`L2`) 被注册到 `gomega`-这是必要的，因为`ginkgo` 和`gomega`并不是固定配对的，替换的匹配库也能和 Ginkgo 一起使用。
+6. `RunSpecs`被调用(`L3`)。这做了一些事情：
+   **测试树构造阶段：**
+   1. Ginkgo 遍历每个顶层容器（即行 `L5` 和 `L27` 的两个`Describe`）并调用他们的匿名函数。
+   2. 当`L5`的函数被调用：
+
+       - 定义一个名为 `book` 的闭包变量(`L6`)
+       - 注册一个`BeforeEach`并传递个匿名函数 (`L7`)。这个函数注册并保存为测试树的一部分而且**还没执行**。
+       - 注册一个带描述和匿名函数的`It` (`L12`)。这个函数注册并保存为测试树的一部分而且**还没执行**。
+       - 添加一个嵌入的`Context`(`L17`)。传入到 `Context` 的匿名函数**马上**被调用从而继续构建测试树。行`L18` 注册`It`。
+       - 这个时间点 `L5` 的匿名函数存在**并永不会被再次调用**。
+
+   3. 行`L27`的顶层`Describe` 中的函数被调用，行为跟前面类似。
+   2. 这个时候顶层容器已经被调用，测试树像这样：
         ```
         [
           ["When Reading A Book", BeforeEach, It "should increment the page number"],
@@ -937,33 +949,33 @@ Here's what happens when this test is run via the `ginkgo` cli, in order:
           ["Looking up ISBN numbers", "When the book can't be found", It "returns an error"],
         ]
         ```
-        Here, the `BeforeEach` and `It` nodes in the tree all contain references to their respective anonymous functions.  Note that there are four tests, each corresponding to one of the four `It`s defined in the test.
+        在这里，测试树中的`BeforeEach` 和 `It`  都包含他们各自匿名函数的引用。注意有四个测试，每个都对应测试中定义的一个 `It`。
 
-    Having constructed the testing tree, Ginkgo can now randomize it deterministically based on the random seed.  This simply amounts to shuffling the list of tests shown above.
+   已经构造了测试树，现在 Ginkgo 能基于随机种子进行随机 `It` 。这就是简单地随机上述测试列表。
 
-    **Test Tree Invocation Phase**:
-    To run the tests, Ginkgo now simply walks the shuffled testing tree.  Invoking the anonymous functions attached to any registered `BeforeEach` and `It` in order.  For example, when running the test defined at `L18` Ginkgo will first invoke the anonymous function passed into the `BeforeEach` at `L7` and then the anonymous function passed into the `It` at `L18`.
+   **测试树调用阶段：** 为了运行测试，Ginkgo 现在简单遍历随机测试树。调用匿名函数按顺序连接到所有 `BeforeEach` 和 `It` 。例如，当运行行 `L18` 的测试时，Ginkgo 会首先调用行 `L7`  传入 `BeforeEach` 的匿名函数，然后调用行 `L18` 传入 `It`  的匿名函数。
 
-    > Note, again, that the parent closure defined at `L5` is _not_ reinvoked.  The functions passed into `Describe`s and `Context`s are _only_ invoked during the **Tree Construction Phase**
+   > 再次强调， 行`L5` 的父闭包不会被重复调用。传入  `Describe`s 和 `Context`s 的函数只会在**构造树阶段**调用。
 
-    > It is an error to define new `It`s, `BeforeEach`es, etc. during the Test Tree Invocation Phase.
+   > 在测试树调用阶段定义新的 `It`, `BeforeEach` 是错误的。
 
-7. `RunSpecs` keeps track of running tests and test failures, updating any attached reporters as the test runs.  When the test completes `RunSpecs` exits and the `TestBooks` function exits.
+7. `RunSpecs` 持续跟踪运行测试和测试错误，更新测试运行时的所有附属报告。当测试完成，`RunSpecs` 和 `TestBooks` 函数退出。
+
+这里有很多的详情，但可以全部归结成一个极简的流程。总结：
+
+运行一个 Ginkgo 测试有两个阶段。
+
+在**测试树构造阶段** 匿名函数传入所有被调用的容器（ 即`Describe` and `Context`）。这些函数定义闭包变量，调用子节点（`It`, `BeforeEach`, 和 `AfterEach` 等）来定义测试树。这些传入子节点的匿名函数在测试树构造阶段**不会**被调用。随后构造的树被随机化。
+
+在**测试树调用阶段**，子节点函数被按顺序调用。注意容器函数这个阶段不会被调用。
 
 
-That was a lot of detail but it all boils down to a fairly simple flow.  To summarize:
 
-There are two phases during a Ginkgo test run.
+### 防止测试污染
 
-In the **Test Tree Construction Phase** the anonymous functions passed into any containers (i.e. `Describe`s and `Context`s) are invoked.  These functions define closure variables and call child nodes (`It`s, `BeforeEach`es, and `AfterEach`es etc.) to definte the testing tree.  The anonymous functions passed into child nodes are **not** called during the Test Tree Construction Phase. Once constructed the tree is randomized.
+因为**测试树调用阶段**被传入到容器的匿名函数不会被重新调用，你不应该指望容器的变量初始化会被重新调用。你必须手动在`BeforeEach`函数中重新初始化任何会被测试改变的变量。
 
-In the **Test Tree Invocation Phase** the child node functions are invoked in the correct order.  Note that the container functions are not invoked during this phase.
-
-### Avoiding test pollution
-
-Because the anonymous functions passed into container functions are _not_ reinvoked during the Test Tree Invocation Phase you should not rely on variable initializations in container functions to be called repeatedly.  You *must*, instead, reinitialize any variables that can be mutated by tests in your `BeforeEach` functions.
-
-Consider, for example, this variation of the `"When reading a book"` `Describe` container defined in `L5` above:
+考虑下，例如，将行上面行 `L5 ` 的  `"When reading a book"` `Describe`  容器改变为：
 
 ```
 var _ = Describe("When reading a book", func() {                                        //L1'
@@ -988,15 +1000,15 @@ var _ = Describe("When reading a book", func() {                                
 })                                                                                      //L18'
 ```
 
-In this variation not only is the book variable shared between both `It`s.  The exact same book instance is shared between both `It`s.  This will lead to confusing test pollution behavior that will vary depending on which order the `It`s are called in.  For example, if the `"should not allow them to read more pages"` test (`L10'`)is invoked first, then the book will already be finished (`L13'`)when the `"should increment the page number"` (`L4'`) test is called resulting in an aberrant test failure.
+这个变化不只是 book 变量在所有 `It` 中共享。而是同一个 book 实例在两个 `It` 中共享。这会导致扰乱测试污染，book 改为依赖 `It` 执行顺序。例如，如果 测试 `"should increment the page number"` (`L4'`)  先被调用，然后测试 `"should increment the page number"` (`L4'`)调用结果为异常测试失败， 由于book 已经是` finished`(`L13'`)。
 
-The correct solution to test pollution like this is to always initialize variables in `BeforeEach` blocks.  This ensures test state is clean between each test run.
+这种测试污染的正确解决方案是将初始化变量放入 `BeforeEach` 块中。这样保证测试状态在每个测试中都是干净的。
 
-### Do not make assertions in container node functions
+### 不要在容器节点函数进行断言
 
-A related, common, error is to make assertions in the anonymous functions passed into container node.  Assertions must _only_ be made in the functions of child nodes as only those functions run during the Test Tree Invocation Phase.
+一个相关的，常见的错误是在容器节点的匿名函数进行断言。断言必须只能在子节点的函数中，因为只有那些函数会在**测试树调用阶段**运行。
 
-So, avoid code like this:
+所以，避免如下代码：
 
 ```
 var _ = Describe("When reading a book", func() {
@@ -1009,13 +1021,13 @@ var _ = Describe("When reading a book", func() {
 })
 ```
 
-If those assertions fail, they will do so during the Test Tree Construction Phase - not the Test Tree Invocation Phase when Ginkgo is tracking and reporting failures.  Instead, initialize variables and make correctness assertions like these inside a `BeforeEach` block.
+如果那些断言失败，他们会做在**测试树构造阶段**做这些，而不是在 Ginkgo 跟踪并报告错误的**测试树调用阶段**。正确的做法是，将初始化变量和执行正确性断言放入 `BeforeEach` 块中。
 
-### Patterns for dynamically generating tests
+### 动态生成测试模式
 
-A common pattern (and one closely related to the [shared example patterns outlined below](#shared-example-patterns)) is to dynamically generate a test suite based on external input (e.g. a file or an environment variable).
+一个常见模式(相关例子 [动态运行测试](#shared-example-patterns))是基于外部输入(例如一个文件或环境变量)动态生成测试套件。
 
-Imagine, for example, a file named `isbn.json` that includes a set of known ISBN lookups:
+想象以下，例如，一个名为 `isbn.json` 的文件，包含一套已知的 ISBN 索引：
 
 ```json
 // isbn.json
@@ -1026,7 +1038,7 @@ Imagine, for example, a file named `isbn.json` that includes a set of known ISBN
 ]
 ```
 
-You might want to generate a collection of tests, one for each book.  A recommended pattern for this is:
+你可能想为生成一堆测试，一本书一个测试。推荐模式是：
 
 ```go
 // isbn_test.go
@@ -1056,9 +1068,9 @@ var _ = Describe("Looking up ISBN numbers", func() {
 })                                                                                                    
 ```
 
-Here `data` is defined and initialized with the contents of the `isbn.json` file during the Test Tree Construction Phase and is then used to define a set of `It`s.
+这里 `data` 在**测试构建阶段**使用 `isbn.json`  文件初始化，然后用于定义一套`It`。
 
-If you have test configuration data like this that you want to share across multiple top-level `Describes` or test files you can either load it in each `Describe` (as shown here) or load it once into a globally shared variable.  The recommended pattern for the latter is to load such variables just prior to the invocation of `RunSpecs`:
+如果你已有类似测试配置数据，你想要在顶层`Describes`共享，或者你想在每个`Describe` （这里展示的）中加载，或者直接在全部共享变量中加载一次。推荐的模式是在`RunSpecs` 之前加载这些变量：
 
 
 ```go
@@ -1084,9 +1096,9 @@ func TestBooks(t *testing.T) {
 }                             
 ```
 
-Here, the `testConfigData` can be referenced in any subsequent `Describe` or `Context` closure and is guaranteed to be initialized as the Test Tree Construction Phase does not begin until `RunSpecs` is invoked.
+这里，`testConfigData` 可以被任意 `Describe` 或 `Context` 闭包引用，并且保证在**测试构建阶段**之前初始化，直到`RunSpecs` 被调用。
 
-If you must make an assertion on the `testConfigData` you can do so in a `BeforeSuite` as follows:
+如果你必须在 `testConfigData` 执行一个断言，你可以像下面代码一样，在 `BeforeSuite` 做：
 
 ```go
 func TestBooks(t *testing.T) {
@@ -1100,9 +1112,9 @@ var _ = BeforeSuite(func() {
 })
 ```                           
 
-This works because `BeforeSuite` functions run during the Test Tree Invocation phase and only run once.
+这能行得通，因为 `BeforeSuite` 函数只在**测试树调用阶段**执行一次。
 
-Lastly - the most common mistake folks encounter when dynamically generating tests is to set up test configuration data in a node that only runs during the Test Tree Invocation Phase.  For example:
+最后，人们最常见的错误：在**测试树调用阶段**，动态生成测试用于初始化节点中的测试配置数据。例如：
 
 ```go
 
@@ -1124,15 +1136,15 @@ var _ = Describe("Looking up ISBN numbers", func() {
 })  
 ```
 
-This will generate zero tests as `testConfigData` will be zero during the Test Tree Construction Phase.
+这会生成零个测试，由于  `testConfigData` 在**测试构造阶段**是空的。
 
 ---
 
-## Asynchronous Tests
+## 异步测试
 
-Go does concurrency well.  Ginkgo provides support for testing asynchronicity effectively.
+Go 的并发做得很好。Ginkgo 为高效异步测试提供支持。
 
-Consider this example:
+考虑这个案例：
 
 ```go
 It("should post to the channel, eventually", func() {
@@ -1142,9 +1154,9 @@ It("should post to the channel, eventually", func() {
     Expect(<-c).To(ContainSubstring("Done!"))
 })
 ```
-This test will block until a response is received over the channel `c`.  A deadlock or timeout is a common failure mode for tests like this, a common pattern in such situations is to add a select statement at the bottom of the function and include a `<-time.After(X)` channel to specify a timeout.
+这个测试会阻塞直到接受到通道`c`的响应。对于这种测试，一个死锁或超时是常见的错误模式。对于这种情况，一个常见模式是在底部添加一个 select 语句 ，并包括一个`<-time.After(X)`通道来指定超时。
 
-Ginkgo has this pattern built in.  The `body` functions in all non-container blocks (`It`s, `BeforeEach`es, `AfterEach`es, `JustBeforeEach`es, `JustAfterEach`es, and `Benchmark`s) can take an optional `done Done` argument:
+Ginkgo 有这种内置模式。在所有无容器块（`It`, `BeforeEach`, `AfterEach`, `JustBeforeEach`, `JustAfterEach`, 和 `Benchmark`）中`body`函数能接受一个可选的`done Done` 参数：
 
 ```go
 It("should post to the channel, eventually", func(done Done) {
@@ -1156,37 +1168,37 @@ It("should post to the channel, eventually", func(done Done) {
 }, 0.2)
 ```
 
-`Done` is a `chan interface{}`.  When Ginkgo detects that the `done Done` argument has been requested it runs the `body` function as a goroutine, wrapping it with the necessary logic to apply a timeout assertion.  You must either close the `done` channel, or send something (anything) to it to tell Ginkgo that your test has ended.  If your test doesn't end after a timeout period, Ginkgo will fail the test and move on the next one.
+`Done` 是一个 `chan interface{}`。当 Ginkgo 检测到 `done Done` 参数已经被请求了，它会运行 用 goroutine 运行 `body` 函数，并将它包裹到一个应用超时断言的必要逻辑中。你必须要么关闭 `done` 通道，要么发送一些东西（任何东西都行）给它来告诉 Ginkgo你的测试已经结束。如果你的测试超时不结束，Ginkgo会让测试失败并进行下一个。 
 
-The default timeout is 1 second. You can modify this timeout by passing a `float64` (in seconds) after the `body` function.  In this example we set the timeout to 0.2 seconds.
+默认的超时是 1 秒。你可以在 `body` 函数后面传递一个 `float64` （秒为单位）修改超时时间。
 
-> Gomega has additional support for making rich assertions on asynchronous code.  Make sure to check out how `Eventually` works in Gomega.
+> Gomega 对于丰富的异步代码断言有额外支持。确保查看了 `Eventually` 在 Gomega 是如何工作的。
 
 ---
 
-## The Ginkgo CLI
+## Ginkgo CLI
 
-The Ginkgo CLI can be installed by running
+可以通过如下命令来安装Ginkgo命令：
 
     $ go install github.com/onsi/ginkgo/ginkgo
 
-It offers a number of conveniences beyond what `go test` provides out of the box and is recommended, but not necessary.
+Ginkgo 比 `go test` 提供了更多方便的指令。推荐使用 Ginkgo 命令虽然这不是必需的。
 
-### Running Tests
+### 运行测试
 
-To run the suite in the current directory, simply run:
+在当前目录下运行该套件，只需：
 
     $ ginkgo #or go test
 
-To run the suites in other directories, simply run:
+在其它目录下运行该套件，只需：
 
     $ ginkgo /path/to/package /path/to/other/package ...
 
-To pass arguments/custom flags down to your test suite:
+传递参数和特定的标签到该测试套件：
 
     $ ginkgo -- <PASS-THROUGHS>
 
-Note: the `--` is important!  Only arguments following `--` will be passed to your suite. To parse arguments/custom flags in your test suite, declare a variable and initialize it at the package-level:
+注意：这个"--"是重要的。只有该双横线后面的参数才会被传递到测试套件。要在你的测试套件中解析参数和特定标签，需要声明一个变量并在包级别初始化它：
 
 ```go
 var myFlag string
@@ -1195,267 +1207,255 @@ func init() {
 }
 ```
 
-Of course, ginkgo takes a number of flags.  These must be specified *before* you specify the packages to run.  Here's a summary of the call syntax:
+当然，Ginkgo使用一些标签。在运行指定的包之前必须指定这些标签。以下是调用语法的摘要：
 
     $ ginkgo <FLAGS> <PACKAGES> -- <PASS-THROUGHS>
 
-Here are the flags that Ginkgo accepts:
+下面是Ginkgo可以接受的一些参数：
 
-**Controlling which test suites run:**
+**指定运行哪些测试套件：**
 
 - `-r`
 
-    Set `-r` to have the `ginkgo` CLI recursively run all test suites under the target directories.  Useful for running all the tests across all your packages.
+    使用`-r`递归运行目标文件夹下的所有测试套件。适用于在所有包中运行所有测试。
 
 - `-skipPackage=PACKAGES,TO,SKIP`
 
-    When running with `-r` you can pass `-skipPackage` a comma-separated list of entries.  Any packages with *paths* that contain one of the entries in this comma separated list will be skipped.
+    当运行带有 `-r`  的测试，你可以传递一个逗号分隔的条目列表给 `-skipPackage`  。任何包的路径如果含有逗号分隔的条目列表之一就会被跳过。
 
-**Running in parallel:**
+**并行测试：**
 
 - `-p`
 
-    Set `-p` to parallelize the test suite across an auto-detected number of nodes.
+    设置  `-p` 可以并行运行测试套件并自动经检测节点数。
 
 - `--nodes=NODE_TOTAL`
 
-    Use this to parallelize the suite across NODE_TOTAL processes.  You don't need to specify `-p` as well (though you can!)
+    使用这个可以并行运行测试套件并使用 NODE_TOTAL 个数的进程。你不需要指定`-p` （尽管你可以！）。
 
 - `-stream`
 
-    By default, when parallelizing a suite, the test runner aggregates data from each parallel node and produces coherent output as the tests run.  Setting `stream` to `true` will, instead, stream output from all parallel nodes in real-time, prepending each log line with the node # that emitted it.  This leads to incoherent (interleaved) output, but is useful when debugging flakey/hanging test suites.
+    默认地，当你并行运行测试套件，测试执行器从每个并行节点聚合数据，在运行测试的时候产生连贯的输出。设置 `stream`为 `true`，则会实时以流形式输出所有并行节点日志，每行头都会带有相应节点 id 。
 
-**Modifying output:**
+**修改输出：**
 
 - `--noColor`
 
-    If provided, Ginkgo's default reporter will not print out in color.
+    如果提供该参数，Ginkgo 默认不使用多种颜色打印报告。
 
 - `--succinct`
 
-    Succinct silences much of Ginkgo's more verbose output.  Test suites that succeed basically get printed out on just one line!  Succinct is turned off, by default, when running tests for one package.  It is turned on by default when Ginkgo runs multiple test packages.
+    Succinct （简洁）会静默 Ginkgo 的详情输出。成功执行的测试套件基本上只会打印一行！当在一个包中运行测试的时候，Succinct 默认关闭。它在 Ginkgo 运行多个测试包的时候默认打开。
 
 - `--v`
 
-    If present, Ginkgo's default reporter will print out the text and location for each spec before running it.  Also, the GinkgoWriter will flush its output to stdout in realtime.
+    如果设置该参数， Ginkgo 默认报告会在每个 spec 运行前打印文本和位置。同时，GinkgoWriter 会实时刷新输出到标准输出。
 
 - `--noisyPendings=false`
 
-    By default, Ginkgo's default reporter will provide detailed output for pending specs.  You can set --noisyPendings=false to suppress this behavior.
+    默认情况下，Ginkgo 默认报告会提供暂停 spec 的详情输出。你可以设置` --noisyPendings=false` 来禁止该行为。
 
 - `--noisySkippings=false`
 
-    By default, Ginkgo's default reporter will provide detailed output for skipped specs.  You can set --noisySkippings=false to suppress this behavior.
+    默认情况下，Ginkgo 默认报告会提供跳过 spec 的详情输出。你可以设置` --noisySkippings=false` 来禁止该行为。
 
 - `--reportPassed`
 
-    If present, Ginkgo's default reporter will print detailed output for passed specs.
+    如果设置该参数，Ginkgo 默认报告会提供通过 spec 的详情输出。
 
 - `--reportFile=<file path>`
 
-    Create report output file in specified path (relative or absolute). It will also override a pre-defined path of `ginkgo.Reporter`, and parent directories will be created, if not exist.
+    在指定路径(相对路径或绝对路径)创建报告输出文件。它会同时覆盖预设的`ginkgo.Reporter` 路径，并且父目录不存在的话会被创建。
 
 - `--trace`
 
-    If present, Ginkgo will print out full stack traces for each failure, not just the line number at which the failure occurs.
+    如果设置该参数，Ginkgo 默认报告会为每个失败打印全栈跟踪日志，不仅仅打印失败发现的行号。
 
 - `--progress`
 
-    If present, Ginkgo will emit the progress to the `GinkgoWriter` as it enters and runs each `BeforeEach`, `AfterEach`, `It`, etc... node.  This is useful for debugging stuck tests (e.g. where exactly is the test getting stuck?) and for making tests that emit many logs to the `GinkgoWriter` more readable (e.g. which logs were emitted in the `BeforeEach`?  Which were emitted by the `It`?).  Combine with `--v` to emit the `--progress` output to stdout.
+    如果设置该参数，当 Ginkgo 进入并运行每个 `BeforeEach`, `AfterEach`, `It` 节点的时候，Ginkgo 会输出过程到 `GinkgoWriter`。这在调试被卡主的测试时（例如测试卡在哪里？），或使用测试输出更多易读的日志到`GinkgoWriter` （例如什么日志在`BeforeEach`中输出？什么日志在`It`中输出？）。结合 `--v`  输出 `--progress` 日志到标准输出。
 
-**Controlling randomization:**
+**控制随机性：**
 
 - `--seed=SEED`
 
-    The random seed to use when permuting the specs.
+    变换 spec 顺序时使用的随机种子。
 
 - `--randomizeAllSpecs`
 
-    If present, all specs will be permuted.  By default Ginkgo will only permute the order of the top level containers.
+    如果设置该参数，所有 spec 都会被重新排序。默认 Ginkgo 只会改变顶层容器的顺序。
 
 - `--randomizeSuites`
 
-    If present and running multiple spec suites, the order in which the specs run will be randomized.
+    如果设置该参数并运行多个 spec 套件，specs 运行的顺序会被随机化。
 
-**Focusing and Skipping specs:**
+**聚焦 spec 和跳过 spec：**
 
 - `--skipMeasurements`
 
-    If present, Ginkgo will skip any `Measure` specs you've defined.
+    如果设置该参数，Ginkgo 会跳过任何你定义的 `Measure` spec 。
 
 - `--focus=REGEXP`
 
-    If provided, Ginkgo will only run specs with descriptions that match the regular expression REGEXP.
+    如果设置该参数，Ginkgo 只会运行带有符合正则表达式 REGEXP 的描述的 spec。
 
 - `--skip=REGEXP`
 
-    If provided, Ginkgo will only run specs with descriptions that do not match the regular expression REGEXP.
+    如果设置该参数，Ginkgo 只会运行不有符合正则表达式 REGEXP 的描述的 spec。
 
-**Running the race detector and code coverage tools:**
+**运行竞态检测和测试覆盖率工具：**
 
 - `-race`
 
-    Set `-race` to have the `ginkgo` CLI run your tests with the race detector on.
+    设置`-race` 来让 `ginkgo` CLI 使用竞态检测来运行测试。
 
 - `-cover`
 
-    Set `-cover` to have the `ginkgo` CLI run your tests with coverage analysis turned on (a Go 1.2+ feature).  Ginkgo will generate coverage profiles under the current directory named `PACKAGE.coverprofile` for each set of package tests that is run.
+    设置`-race` 来让 `ginkgo` CLI 使用代码覆盖率分析工具来运行测试（Go 1.2+ 的功能）。Ginkgo 会在在个测试包的目录下生成名为`PACKAGE.coverprofile` 的代码覆盖文件。
 
 - `-coverpkg=<PKG1>,<PKG2>`
 
-    Like `-cover`, `-coverpkg` runs your tests with coverage analysis turned on.  However, `-coverpkg` allows you to specify the packages to run the analysis on.  This allows you to get coverage on packages outside of the current package, which is useful for integration tests.  Note that it will not run coverage on the current package by default, you always need to specify all packages you want coverage for.
-    The package name should be fully resolved, eg `github.com/onsi/ginkgo/reporters/stenographer`
+    `-cover`, `-coverpkg` 运行你的测试并开启代码覆盖率分析。然而， `-coverpkg` 允许你知道需要分析的包。它允许你获得当前包之外的包的代码覆盖率，这对集成测试很有用。注意，它默认不在当前包运行覆盖率分析，你需要制定所有你想分析的包。包名应该是全写，例如`github.com/onsi/ginkgo/reporters/stenographer`。
 
 - `-coverprofile=<FILENAME>`
 
-    Renames coverage results file to a provided filename
+    使用 `FILENAME` 重命名代码覆盖率文件的名字。
     
 - `-outputdir=<DIRECTORY>`
    
-    Moves coverage results to a specified directory <br />
-    When combined with `-coverprofile` will also append them together
+    将覆盖率输出文件移到到指定目录。<br />
+    结合`-coverprofile` 参数也能使用。
     
-**Build flags:**
+**构建参数：**
 
 - `-tags`
 
-    Set `-tags` to pass in build tags down to the compilation step.
+    设置`-tags`来传递 标识到编译步骤。
 
 - `-compilers`
 
-    When compiling multiple test suites (e.g. with `ginkgo -r`) Ginkgo will use `runtime.NumCPU()` to determine the number of compile processes to spin up.  On some environments this is a bad idea.  You can specify th enumber of compilers manually with this flag.
+    当编译多个测试套件（如 `ginkgo -r`），Ginkgo 会使用 `runtime.NumCPU()` 绝对启动的编译进程数。在一些环境中这不是个好主意。你可以通过这个参数手动指定编译器进程数。
 
-**Failure behavior:**
+**失败行为：**
 
 - `--failOnPending`
 
-    If present, Ginkgo will mark a test suite as failed if it has any pending specs.
+    如果设置该参数，Ginkgo 会在有暂停 spec 的情况下使套件失败。
 
 - `--failFast`
 
-    If present, Ginkgo will stop the suite right after the first spec failure.
+    如果设置该参数，Ginkgo 会在第一个 sepc 时候后立即停止套件。
 
-**Watch flags:**
+**监视参数：**
 
 - `--depth=DEPTH`
 
-    When watching packages, Ginkgo also watches those package's dependencies for changes.  The default value for `--depth` is `1` meaning that only the immediate dependencies of a package are monitored.  You can adjust this up to monitor dependencies-of-dependencies, or set it to `0` to only monitor the package itself, not its dependencies.
+    当监视包的时候，Ginkgo 同时监视包依赖的变化。默认的 `--depth` 为 1 ，意味着只有直接依赖的包被监控。你能调整它到 依赖的依赖（dependencies-of-dependencies），或者设置为零就只监控它自己，不监控依赖。
 
 - `--watchRegExp=WATCH_REG_EXP`
 
-    When watching packages, Ginkgo only monitors files matching the watch regular expression for changes.  The default value is `\.go$` meaning only go files are watched for changes.
+    当监视包的时候，Ginkgo只监控符合该正则表达式的文件。默认值是`\.go$` ，意味着只有 go 文件的变化会被监视。
 
-**Flaky test mitigation:**
+**减少随机失败的测试(flaky test):**
 
 - `--flakeAttempts=ATTEMPTS`
 
-    If a test fails, Gingko can rerun it immediately. Set this flag to a value
-    greater than 1 to enable retries. As long as one of the retries succeeds,
-    Ginkgo will not consider the test suite to have been failed. The individual
-    failed runs will still be reported in the output; the JUnit output, for
-    example, will claim 0 failures (since the suite passed) but will still
-    contain any failing runs for a test that both passed and failed.
+    如果一个测试失败了，Ginkgo 能马上返回。设置这个参数大于 1 的话会重试。只要一个重试成功，Ginkgo 就不会认为测试套件失败。单独失败的运行仍会被报告在输出中；举个例子，JUnit 输出中，会声称 0 失败（因为套件通过了），但是仍会包含一个同时失败和成功的测试的所有失败的运行。
 
-    This flag is dangerous! Don't be tempted to use it to cover up bad tests!
+    这个参数很危险！不要试图使用它来掩盖失败的测试！
 
-**Miscellaneous:**
+**杂项：**
 
 - `-dryRun`
 
-    If present, Ginkgo will walk your test suite and report output *without* actually running your tests.  This is best paired with `-v` to preview which tests will run.  Ther ordering of the tests honors the randomization strategy specified by `--seed` and `--randomizeAllSpecs`.
+    如果设置该参数，Ginkgo 会遍历你的测试套件并报告输出，但是不会真正运行你的测试。这最好搭配`-v`来预览你将运行的测试。测试的顺序遵循了 `--seed` 和 `--randomizeAllSpecs` 指定的随机策略。
 
 - `-keepGoing`
 
-    By default, when running multiple tests (with -r or a list of packages) Ginkgo will abort when a test fails.  To have Ginkgo run subsequent test suites after a failure you can set -keepGoing.
+    默认地，当多个测试运行的时候（使用 `-r`或一列表的包），Ginkgo 在一个测试失败的时候会中断。要让 Ginkgo 时候后继续接下来的测试套件，你可以设置 `-keepGoing`。
 
 - `-untilItFails`
 
-    If set to `true`, Ginkgo will keep running your tests until a failure occurs.  This can be useful to help suss out race conditions or flakey tests.  It's best to run this with `--randomizeAllSpecs` and `--randomizeSuites` to permute test order between iterations.
+    如果设置为 `true`，Ginkgo 会持续运行测试直到发送失败。这会有助于弄明白竞态条件或者古怪测试。最好搭配 `--randomizeAllSpecs` 和 `--randomizeSuites` 来变换迭代的测试顺序。
 
 - `-notify`
 
-    Set `-notify` to receive desktop notifications when a test suite completes.  This is especially useful with the `watch` subcommand.  Currently `-notify` is only supported on OS X and Linux.  On OS X you'll need to `brew install terminal-notifier` to receive notifications, on Linux you'll need to download and install `notify-send`.
+    设置 `-notify`  来接受桌面测试套件完成的通知。结合子命令 `watch`  特别有用。当前 `-notify`  只有 OS X 和 Linux 支持。在 OS X 上，你需要运行 `brew install terminal-notifier` 来接受通知，在 Linux 你需要下载安装 `notify-send`。
 
 - `--slowSpecThreshold=TIME_IN_SECONDS`
 
-    By default, Ginkgo's default reporter will flag tests that take longer than 5 seconds to run -- this does not fail the suite, it simply notifies you of slow running specs.  You can change this threshold using this flag.
+    默认地，Ginkgo报告器会表示运行超过 5 秒的测试，这不会使测试失败，它只是通知你该 sepc 运行慢。你可以使用这个参数修改该门槛。
 
 - `-timeout=DURATION`
 
-    Ginkgo will fail the test suite if it takes longer than `DURATION` to run.  The default value is 24 hours.
+    如果时间超过 `DURATION` ，Ginkgo 会使测试套件失败。默认值是 24 小时。
 
 - `--afterSuiteHook=HOOK_COMMAND`
 
-    Ginko has the ability to run a command hook after a suite test completes.  You simply give it the command to run and it will do string replacement to pass data into the command.  Example: --afterSuiteHook=”echo  (ginkgo-suite-name) suite tests have [(ginkgo-suite-passed)]”  This suite hook will replace (ginkgo-suite-name) and (ginkgo-suite-passed) with the suite name and pass/fail status respectively, then echo that to the terminal.
+    Ginko 有能力在套件测试结束后运行一个命令（a command hook）。你只需给它需要运行的命令，它就会替换字符串来传给命令数据。举例：` –afterSuiteHook=”echo (ginkgo-suite-name) suite tests have [(ginkgo-suite-passed)]” `，这个测试沟子会替换 (ginkgo-suite-name) 和 (ginkgo-suite-passed) 为套件名和各自的通过/失败状态，然后输出到终端。
 
 - `-requireSuite`
 
-    If you create a package with Ginkgo test files, but forget to run `ginkgo bootstrap` your tests will never run and the suite will always pass. Ginkgo does notify with the message `Found no test suites, did you forget to run "ginkgo bootstrap"?` but doesn't fail. This flag causes Ginkgo to mark the suite as failed if there are test files but nothing that references `RunSpecs.`
+    如果你使用 Ginkgo 测试文件创建包，但是你忘了运行  `ginkgo bootstrap`  初始化，你的测试不会运行而且该套件会一致通过。Ginkgo 会通知你  `Found no test suites, did you forget to run "ginkgo bootstrap"?`  ，但是不会失败。如果有测试文件但没有引用`RunSpecs.`，这个参数使得 Ginkgo 标识套件为失败。
 
-### Watching For Changes
+### 监视修改
 
-The Ginkgo CLI provides a `watch` subcommand that takes (almost) all the flags that the main `ginkgo` command takes.  With `ginkgo watch` ginkgo will monitor the package in the current directory and trigger tests when changes are detected.
+Ginkgo CLI 提供子命令  `watch`  ，监视（几乎）所有的  `ginkgo`  命令参数。使用`ginkgo watch` ，Ginkgo 会监控当前目录的包，当有修改的时候就触发测试。
 
-You can also run `ginkgo watch -r` to monitor all packages recursively.
+你也可以使用 `ginkgo watch -r`  递归监控所有包。
 
-For each monitored packaged, Ginkgo will also monitor that package's dependencies and trigger the monitored package's test suite when a change in a dependency is detected.  By default, `ginkgo watch` monitors a package's immediate dependencies.  You can adjust this using the `-depth` flag.  Set `-depth` to `0` to disable monitoring dependencies and set `-depth` to something greater than `1` to monitor deeper down the dependency graph.
+对每个被监控的包，Ginkgo 也会监控包的依赖并在依赖产生修改的时候触发测试套件。默认地，`ginkgo watch`  监控包的直接依赖。你可以使用  `-depth`  来调整。设置 `-depth` 为0则不监控依赖，设置  `-depth`  大于 1 则监控更深依赖路径。
 
-Passing the `-notify` flag on Linux or OS X will trigger desktop notifications when `ginkgo watch` triggers and completes a test run.
+在 Linux 或 OS X 传递  `-notify`  参数，会在 `ginkgo watch` 触发和完成测试的时候产生桌面通知。
 
-### Precompiling Tests
+### 预编译测试
 
-Ginkgo has strong support for writing integration-style acceptance tests.  These tests are useful tools to validate that (for example) a complex distributed system is functioning correctly.  It is often convenient to distribute these acceptance tests as standalone binaries.
-
-Ginkgo allows you to build such binaries with:
+Ginkgo 对写集成风格的验收测试（integration-style acceptance tests）有强力的支持。比如，这些测试有助于验证一个复杂分布式系统的函数是否正确。它常便于分布这些作为单独二进制文件的验收测试。
+Ginkgo 允许你这样构建这些二进制文件：
 
     ginkgo build path/to/package
 
-This will produce a precompiled binary called `package.test`.  You can then invoke `package.test` directly to run the test suite.  Under the hood `ginkgo` is simply calling `go test -c -o` to compile the `package.test` binary.
-
-Calling `package.test` directly will run the tests in *series*.  To run the tests in parallel you'll need the `ginkgo` cli to orchestrate the parallel nodes.  You can run:
+这会产生一个名为 `package.test `的预编译二进制文件。然后，你能直接调用 `package.test` 来运行测试套件。原理很简单， `ginkgo` 只是调用 `go test -c -o` 来编译 `package.test` 二进制文件。
+直接调用  `package.test` 会*连续*运行测试。要并行测试的话，你需要 `ginkgo` cli 编排并行节点。你可以运行：
 
     ginkgo -p path/to/package.test
 
-to do this.  Since the ginkgo CLI is a single binary you can provide a parallelizable (and therefore *fast*) set of integration-style acceptance tests simply by distributing two binaries.
+来这样做。因为 Ginkgo CLI 是一个单独二进制文件，你能直接分布两个二进制文件，来提供一个并行(所以快速)的集成风格验收测试集合。
 
-> The `build` subcommand accepts a subset of the flags that `ginkgo` and `ginkgo watch` take.  These flags are constrained to compile-time concerns such as `--cover` and `--race`.  You can learn more via `ginkgo help build`.
+> `build`子命令接受一系列 `ginkgo` 和 `ginkgo watch` 接收的参数。这些参数仅限关注于编译时，就像 `--cover` 和 `--race`。通过 `ginkgo help build`，你能获得更多信息。
 
-> You can cross-compile and target different platforms using the standard `GOOS` and `GOARCH` environment variables.  So `GOOS=linux GOARCH=amd64 ginkgo build path/to/package` run on OS X will create a `package.test` binary that runs on linux.
+> 使用标准 `GOOS` 和 `GOARCH` 环境变量，你能交叉编译并面向不同平台。因此，在 OS X 上运行 `GOOS=linux GOARCH=amd64 ginkgo build path/to/package` ，会产生一个能在 Linux 上运行的二进制文件。
+### 生成器
 
-### Generators
-
-- To bootstrap a Ginkgo test suite for the package in the current directory, run:
+- 在当前目录，为一个包引导 Ginkgo 测试套件，可以运行：
 
         $ ginkgo bootstrap
 
-    This will generate a file named `PACKAGE_suite_test.go` where PACKAGE is the name of the current directory.
+    这会生成一个名为 `PACKAGE_suite_test.go` 的文件，PACKAGE 是当前目录的名称。
 
-- To add a test file to a package, run:
+- 如要添加一个测试文件，运行：
 
         $ ginkgo generate <SUBJECT>
 
-    This will generate a file named `SUBJECT_test.go`.  If you don't specify SUBJECT, it will generate a file named `PACKAGE_test.go` where PACKAGE is the name of the current directory.
+    这会生成一个名为 `SUBJECT_test.go` 的文件。如果你不指定 SUBJECT ，它会生成一个名为 `PACKAGE_test.go` 的文件，PACKAGE 是当前目录的名称。
 
-By default, these generators will dot-import both Ginkgo and Gomega.  To avoid dot imports, you can pass `--nodot` to both subcommands.  This is discussed more fully in the [next section](#avoiding-dot-imports).
+默认地，这些生成器会点引用（dot-import）Ginkgo 和 Gomega。想避免点导入，你可以传入  `--nodot`  到两个子命令。详情请看 [下一章](#避免点导入)
 
-> Note that you don't have to use either of these generators.  They're just convenient helpers to get you up and running quickly.
+> 注意，你不是必须使用这两个生成器。他们是方便你快速初始化。
 
-### Avoiding Dot Imports
+### 避免点导入
 
-Ginkgo and Gomega provide a DSL and, by default, the `ginkgo bootstrap` and `ginkgo generate` commands import both packages into the top-level namespace using dot imports.
-
-There are certain, rare, cases where you need to avoid this.  For example, your code may define methods with names that conflict with the methods defined in Ginkgo and/or Gomega.  In such cases you can either import your code into its own namespace (i.e. drop the `.` in front of your package import).  Or, you can drop the `.` in front of Ginkgo and/or Gomega.  The latter comes at the cost of constantly having to preface your `Describe`s and `It`s with `ginkgo.` and your `Expect`s and `ContainSubstring`s with `gomega.`.
-
-There is a *third* option that the ginkgo CLI provides, however.  If you need to (or simply want to!) avoid dot imports you can:
+Ginkgo 和 Gomega 提供了一个 DSL ，而且，默认地 `ginkgo bootstrap` 和 `ginkgo generate` 命令使用点导入导入两个包到顶层命名空间。
+有少许确定的情况，你需要避免点导入。例如，你的代码可能定义了与 Ginkgo 或 Gomega 方法冲突的方法名。这中情况下，你可以将你的代码导入到自己的命名空间（换言之，移除导入你的包签名的 `.`）。或者，你可以移除 Ginkgo 或 Gomega 签名的 `.`。后者会导致你一直要在  `Describe` 和 `It` 前面加 `ginkgo.` ，并且你的 `Expect` 和 `ContainSubstring ` 前面也都要加 `gomega.` 。
+然而，这是第三个 ginkgo CLI 提供的选项。如果你需要（或想要）避免点导入你可以：
 
     ginkgo bootstrap --nodot
 
-and
+和
 
     ginkgo generate --nodot <filename>
 
-This will create a bootstrap file that *explicitly* imports all the exported identifiers in Ginkgo and Gomega into the top level namespace.  This happens at the bottom of your bootstrap file and generates code that looks something like:
-
+这会创建一个引导文件，明确地在顶级命名空间，导入所有 Ginkgo 和 Gomega 的导出标识符。这出现在你引导文件的地步，生成的代码就像这样：
 ```go
 import (
     github.com/onsi/ginkgo
@@ -1471,7 +1471,7 @@ var It = ginkgo.It
 // etc...
 ```
 
-This allows you to write tests using `Describe`, `Context`, and `It` without dot imports and without the `ginkgo.` prefix.  Crucially, it also allows you to redefine any conflicting identifiers (or even cook up your own semantics!).  For example:
+这允许你使用 `Describe`, `Context`, 和 `It`写测试，而不用添加 `ginkgo.`前缀。关键地，它同时允许你冲定义任何冲突的标识符（或组织你自己的语意）。例如：
 
 ```go
 var _ = ginkgo.Describe
@@ -1479,51 +1479,45 @@ var When = ginkgo.Context
 var Then = ginkgo.It
 ```
 
-This will avoid importing `Describe` and will rename `Context` to `When` and `It` to `Then`.
-
-As new matchers are added to Gomega you may need to update the set of imports identifiers.  You can do this by entering the directory containing your bootstrap file and running:
+这会避免导入`Describe`，并会将`Context` 和 `It` 重命名为 `When` 和 `Then`。
+当新匹配库被添加到 Gomega ，你需要更新这些导入的标识符。你可以这样，进入包含引导文件的目录并运行：
 
     ginkgo nodot
 
-this will update the imports, preserving any renames that you've provided.
+这会更新导入，保留你提供的重命名。
 
-### Converting Existing Tests
+### 转换已存在的测试
 
-If you have an existing XUnit test suite that you'd like to convert to a Ginkgo suite, you can use the `ginkgo convert` command:
+如果你有一个 XUnit 测试套件，而且你想把它转化为 Ginkgo 套件，你可以使用  `ginkgo convert` 命令：
 
     ginkgo convert github.com/your/package
 
-This will generate a Ginkgo bootstrap file and convert any `TestX...(t *testing.T)` XUnit style tsts into simply (flat) Ginkgo tests.  It also substitutes `GinkgoT()` for any references to `*testing.T` in your code.  `ginkgo convert` usually gets things right the first time round, but you may need to go in and tweak your tests after the fact.
+这会生成一个 Ginkgo 引导文件，转化所有 XUnit 风格  `TestX...(t *testing.T)`  为简单（平坦）的 Ginkgo 测试。它同时将你代码中的 `GinkgoT()` 替换为  `*testing.T`  。  `ginkgo convert`  一般第一次就能正确转换，但事后你可能需要微调一下测试。
+同时： `ginkgo convert`  会**覆盖 **你的测试文件，因此确保你尝试 `ginkgo convert` 之前，已经没有未提交的修改了。
+`ginkgo convert` 是[Tim Jarratt](https://github.com/tjarratt) 的主意。
+### 其它子命令
 
-Also: `ginkgo convert` will **overwrite** your existing test files, so make sure you don't have any uncommitted changes before trying `ginkgo convert`!
-
-`ginkgo convert` is the brainchild of [Tim Jarratt](https://github.com/tjarratt)
-
-### Other Subcommands
-
-- To unfocus any programmatically focused tests in the current directory (and subdirectories):
+- 将当前目录(和子目录)写入代码的重点测试设为普通测试：
 
         $ ginkgo unfocus
 
-- For help:
+- 查看帮助：
 
         $ ginkgo help
 
-    For help on a particular subcommand:
+    查看特定子目录的帮助：
 
         $ ginkgo help <COMMAND>
 
-- To get the current version of Ginkgo:
+- 获取当前 Ginkgo 的版本：
 
         $ ginkgo version
 
 ---
 
-## Benchmark Tests
+## 基准测试
 
-Ginkgo allows you to measure the performance of your code using `Measure` blocks.   `Measure` blocks can go wherever an `It` block can go -- each `Measure` generates a new spec.  The closure function passed to `Measure` must take a `Benchmarker` argument.  The `Benchmarker` is used to measure runtimes and record arbitrary numerical values.  You must also pass `Measure` an integer after your closure function, this represents the number of samples of your code `Measure` will perform.
-
-For example:
+Ginkgo 允许你使用Measure块来测量你的代码的性能。Measure块可以运行在任何It块可以运行的地方--每一个Meature生成一个规格。传递给Measure的闭包函数必须使用Benchmarker参数。Benchmarker用于测量运行时间并记录任意数值。你也必须在该闭包函数之后传递一个整型参数给Measure，它表示Measure将执行的你的代码的样本数。例如：
 
 ```go
 Measure("it should do something hard efficiently", func(b Benchmarker) {
@@ -1538,7 +1532,7 @@ Measure("it should do something hard efficiently", func(b Benchmarker) {
 }, 10)
 ```
 
-will run the closure function 10 times, aggregating data for "runtime" and "disk usage".  Ginkgo's reporter will then print out a summary of each of these metrics containing some simple statistics:
+它将联合“runtime” 和 “disk usage”的数据把这个闭包函数运行10次。然后， Ginkgo的reporter将会打印出每一个包含简单统计的指标的总结：
 
     • [MEASUREMENT]
     Suite
@@ -1555,51 +1549,49 @@ will run the closure function 10 times, aggregating data for "runtime" and "disk
            Largest: 5.2
            Average: 3.9 ± 0.4
 
-With `Measure` you can write expressive, exploratory, specs to measure the performance of various parts of your code (or external components, if you use Ginkgo to write integration tests).  As you collect your data, you can leave the `Measure` specs in place to monitor performance and fail the suite should components start growing slow and bloated.
+通过使用Measure, 你可以编写富有表现力，探索性的规格来测量你的代码各个部分的性能（或者外部组件，如果你在使用Ginkgo来编写集成测试）。在收集数据时，你可以保留Measure规格以监控性能，如果组件开始变得缓慢和臃肿，则套件会失败。
 
-`Measure`s can live alongside `It`s within a test suite.  If you want to run just the `It`s you can pass the `--skipMeasurements` flag to `ginkgo`.
+`Measures` 和 `Its` 可以在同一个测试套件中使用。如果你只想运行 `Its` ，你可以传递 `--skipMeasurements` 标签给 Ginkgo.
 
-> You can also mark `Measure`s as pending with `PMeasure` and `XMeasure` or focus them with `FMeasure`.
+> 您还可以使用 `PMeasure` 和 `XMeasure` 将 `Measures` 标记为待处理，或者将它们与 `FMeasure` 一起使用。
 
-### Measuring Time
+### 测量时间
 
-The `Benchmarker` passed into your closure function provides the
+传递到你的闭包函数的Benchmarker提供了
 
 ```go
 Time(name string, body func(), info ...Interface{}) time.Duration
 ```
 
- method.  `Time` runs the passed in `body` function and records, and returns, its runtime.  The resulting measurements for each sample are aggregated and some simple statistics are computed.  These stats appear in the spec output under the `name` you pass in.  Note that `name` must be unique within the scope of the `Measure` node.
+方法。Times运行传入的body函数，并且记录和返回它的运行时。对每个样本的测量值进行汇总和计算一些简单的统计数据。在传入的name下的规格输出中会显示这些统计数据。注意，在Measure节点的作用域内name必须是唯一的。
+你还可以通过可选的info参数传递任意信息。它将会和Time测量的聚合运行时一起传递给reporter。默认reporter使用info的字符串表示形式，但是你也可以编写一个定制的reporter来执行更架构化的东西。例如，您可能会运行相同代码的多个测量，但会在运行时更改某些参数。您可以在info中对该参数的值进行编码，然后让自定义报告器使用该info和Ginkgo提供的统计信息来生成CSV文件 - 甚至可能是图表。
 
- You can also pass arbitrary information via the optional `info` argument.  This will be passed along to the reporter along with the agreggated runtimes that `Time` measures.  The default reporter presents a string representation of `info`, but you can write a custom reporter to perform something more structured.  For example, you might run several measurements of the same code, but vary some parameter between runs.  You could encode the value of that parameter in `info`, and then have a custom reporter that uses `info` and the statistics provided by Ginkgo to generate a CSV file - or perhaps even a plot.
+如果你想断言body在某个阈值时间内运行，你可以对Time的返回值进行断言。
+### 记录任意值
 
- If you want to assert that `body` ran within some threshold time, you can make an assertion against `Time`'s return value.
-
-### Recording Arbitrary Values
-
-The `Benchmarker` also provides the
+Benchmarker 也提供
 
 ```go
 RecordValue(name string, value float64, info ...Interface{})
 ```
 
-method.  `RecordValue` allows you to record arbitrary numerical data.  These results are aggregated and some simple statistics are computed.  These stats appear in the spec output under the `name` you pass in.  Note that `name` must be unique within the scope of the `Measure` node.
+方法。RecordValue允许你记录任意数字化的数值。聚合这些结果并计算一些简单的统计数据。这些统计信息显示在您传入name下的规格输出中。注意，在Measure节点的作用域内name必须是唯一的。
 
-The optional `info` parameter can be used to pass structured data to a custom reporter.  See [Measuring Time](#measuring-time) above for more details.
+可选的info参数可用于将结构化数据传递给自定义报告器。请参阅上面的[测量时间](#测量时间)以获取更多详
 
 ---
 
-## Shared Example Patterns
+## 共享示例模式
 
-Ginkgo doesn't have any explicit support for Shared Examples (also known as Shared Behaviors) but there are a few patterns that you can use to reuse tests across your suite.
+Ginkgo对共享示例（也称为共享行为）没有任何显式支持，但是您可以使用一些模式来复用套件中的测试。
 
-### Locally-scoped Shared Behaviors
+### 本地作用域的共享行为
 
-It is often the case that within a particular suite, there will be a number of different `Context`s that assert the exact same behavior, in that they have identical `It`s within them.  The only difference between these `Context`s is the set up done in their respective `BeforeEach`s.  Rather than repeat the `It`s for these `Context`s, here are two ways to extract the code and avoid repeating yourself.
+经常有这种情况，有一个套件，包含了相同断言行为的不同 `Context` ，但其中有相同的 `It` 。这些 `Context` 唯一的不同，就是他们各自`BeforeEach`中的初始化。与其在 `Context` 重复相同 `It` ，这里提供两个方法来提取代码，避免重复。
 
-#### Pattern 1: Extract a function that defines the shared `It`s
+#### 模式 1 ：提取定义共享`It` 的函数
 
-Here, we will pull out a function that lives within the same closure that `Context`s live in, that defines the `It`s that are common to those `Context`s.  For example:
+在这，我们会拉取一个包含`Context`的相同闭包中的函数。该函数定义这些 `Context` 中相同的 `It` 。例如：
 
 ```go
 Describe("my api client", func() {
@@ -1651,14 +1643,13 @@ Describe("my api client", func() {
     })
 })
 ```
+注意，`AssertFailedBehavior` 函数在`Context` 的 body 中被调用。`It` 在该外部容器中的函数中定义。因为函数共享闭包作用域，我们不需要传入`response` 通道。 
 
-Note that the `AssertFailedBehavior` function is called within the body of the `Context` container block.  The `It`s defined by this function get added to the enclosing container.  Since the function shares the same closure scope we don't need to pass the `response` channel in.
+你可以放入任意 `It`  到上面的共享行为 `AssertFailedBehavior` 中，并且甚至可以在 `AssertFailedBehavior` 中连同 `Context` 嵌套 `It`。尽管这并不总是一个 有效地优化(DRY don't repeat yourself) 测试套件的好方法，但你认为它合适的时候，这个模式让你能这样做。这个方法的缺点之一，你不能聚焦或待定一个共享行为组，或者组中的`examples` 或`contexts`。换句话说，你不能直接使用 `FAssertFailedBehavior`和 `XAssertFailedBehavior`。
 
-You can put as many `It`s as you wanted into the shared behavior `AssertFailedBehavior` above, and can even nest `It`s within `Context`s inside of `AssertFailedBehavior`.  Although it may not always be the best idea to DRY your test suites excessively, this pattern gives you the ability do so as you see fit.  One drawback of this approach, however, is that you cannot focus or pend a shared behavior group, or examples/contexts within the group.  In other words, you don't get `FAssertFailedBehavior` or `XAssertFailedBehavior` for free.
+#### 模式 2：提取返回闭包的函数，并将其传入`It`
 
-#### Pattern 2: Extract functions that return closures, and pass the results to `It`s
-
-To understand this pattern, let's just redo the above example with this pattern:
+要理解这个模式，我们重做上述案例：
 
 ```go
 Describe("my api client", func() {
@@ -1715,13 +1706,13 @@ Describe("my api client", func() {
 })
 ```
 
-Note that this solution is still very compact, especially because there are only two shared `It`s for each `Context`.  There is slightly more repetition here, but it's also slightly more explicit.  The main benefit of this pattern is you can focus and pend individual `It`s in individual `Context`s.
+注意，这个解决方案仍然很简洁，尤其因为每个 `Context` 只有两个共享的 `It` 。这里多了一点重复，但是它也更明确了一点。主要的好处是，你可以聚焦和待定一个在单独 `Context` 中的单独 `It` 。
 
-### Global Shared Behaviors
+### 全局共享行为
 
-The patterns outlined above work well when the shared behavior is intended to be used within a fixed scope.  If you want to build shared behavior that can be used across different test files (or even different packages) you'll need to tweak the pattern to make it possible to pass inputs in.  We can extend both examples outlined above to illustrate how this might work:
+在共享行为只在一个固定作用域使用的时候，上面的模式很好用。如果你想要构建一个模式，但是涉及跨文件的话，你需要微调一下该模式来传递输入。我们扩展上面两个例子来展示怎么做：
 
-#### Pattern 1
+#### 模式 1 ：
 
 ```go
 package sharedbehaviors
@@ -1746,7 +1737,7 @@ func SharedFailedResponseBehavior(inputs *FailedResponseBehaviorInputs) {
 }
 ```
 
-#### Pattern 2
+#### 模式 2
 
 ```go
 package sharedbehaviors
@@ -1773,13 +1764,11 @@ func AssertDoesNotReportSuccess(inputs *FailedResponseBehaviorInputs) func() {
 }
 ```
 
-Users of the shared behavior must generate and populate a `FailedResponseBehaviorInputs` and pass it in to either `SharedFailedResponseBehavior` or `AssertNoJSONInResponese` and `AssertDoesNotReportSuccess`.  Why do things this way?  Two reasons:
+共享行为的用户必须生成并放入 `FailedResponseBehaviorInputs` ，再将它传入`SharedFailedResponseBehavior` 或 `AssertNoJSONInResponese` 和 `AssertDoesNotReportSuccess` 。为什么这样做？两个原因：
 
-1. Having a stuct to encapsulate the input variables (like `FailedResponseBehaviorInputs`) allows you to clearly stipulate the contract between the the specs and the shared behavior.  The shared behavior *needs* these inputs in order to function correctly.
-
-2. More importantly, inputs like the `response` channel are generally created and/or set in `BeforeEach` blocks.  However the shared behavior functions must be called within a container block and will not have access to any variables specified in a `BeforeEach` as the `BeforeEach` hasn't run yet.  To get around this, we instantiate a `FailedResponseBehaviorInputs` and pass a pointer to it to the shared behavior functions -- in the `BeforeEach` we manipulate the fields of the `FailedResponseBehaviorInputs`, ensuring that their values get communicated to the `It`s generated by the shared behavior.
-
-Here's what the calling test would look like after dot-importing the `sharedbehaviors` package (for brevity we'll combine patterns 1 and 2 in this example):
+1. 将输入变量封装到结构体中（就像 `FailedResponseBehaviorInputs` ），允许你清楚地规定 sepc 和共享行为间的合约。共享行为需要这些输入才能工作。
+2. 更重要的是，像`response`通道的输入，一般在 `BeforeEach` 块中创建或赋值。然而，共享行为函数必须在容器内调用，并且不能访问`BeforeEach`中指定的变量，因为此时 `BeforeEach` 还没运行。要解决这个问题，我们实例化一个 `FailedResponseBehaviorInputs` ，并将一个指向它的指针传入共享行为函数。在 `BeforeEach` 中，我们操作 `FailedResponseBehaviorInputs` 的字段，确保他们的值能和共享行为生成的 `It` 交互。
+下面是点导入 `sharedbehaviors` 包后，调用测试的代码（简单起见，我们两个模式放入到一个例子中）：
 
 ```go
 Describe("my api client", func() {
@@ -1820,25 +1809,25 @@ Describe("my api client", func() {
 
 ---
 
-## Ginkgo and Continuous Integration
+## Ginkgo与持续集成
 
-Ginkgo comes with a number of [flags](#running-tests) that you probably want to turn on when running in a Continuous Integration environment.  The following is recommended:
+Ginkgo附带了许多标签，您可能希望在持续集成环境运行时打开这些标签。建议如下：
 
     ginkgo -r --randomizeAllSpecs --randomizeSuites --failOnPending --cover --trace --race --progress
 
-- `-r` will recursively find and run all spec suites in the current directory
-- `--randomizeAllSpecs` and `--randomizeSuites` will shuffle both the order in which specs within a suite run, and the order in which different suites run.  This can be *great* for identifying test pollution.  You can always rerun a given ordering later by passing the `--seed` flag a matching seed.
-- `--failOnPending` causes the test suite to fail if there are any pending tests (typically these should not be committed but should signify work in progress).
-- `--cover` generates `.coverprofile`s and coverage statistics for each test suite.
-- `--trace` prints out a full stack trace when failures occur.  This makes debugging based on CI logs easier.
-- `--race` runs the tests with the race detector turned on.
-- `--progress` emits test progress to the GinkgoWriter.  Makes identifying where failures occur a little easier.
+- `-r` 会递归运行目标文件夹下的所有测试套件。
+- `--randomizeAllSpecs` 和 `--randomizeSuites` 会使套件中的 sepc 和不同套件的运行顺序随机。这对于识别测试污染很好用。你总可以重现该顺序通过设置对应 `--seed`  参数。
+- `--failOnPending` 会在有待定的 spec 的情况下使套件失败。 (通常，这些测试不该被提交，但应该提示正在运行的测试).
+- `--cover` 生成 `.coverprofile`文件，并未每个测试套件做覆盖率统计。
+- `--trace` 报告会为每个失败打印全栈跟踪日志。这使得持续集成的日志更易与调试。
+- `--race` 运行测试并打开竞态检测器。
+- `--progress` 输出测试过程到 GinkgoWriter. 更利于识别失败发生的地方。
 
-It is *not* recommended that you run tests in parallel on CI with `-p`.  Many CI systems run on multi-core machines that report very many (e.g. 32 nodes).  Parallelizing on such a high scale typically yields *longer* test run times (particularly since your tests are probably running inside some sort of cpu-share limited container: you don't actually have free reign of all 32 cores).  To run tests in parallel on CI you're probably better off providing an explicit number of parallel nodes with `-nodes`.
+不推荐你在持续集成的时候使用 `-p`运行并行测试。很多持续集成系统运行在很多核的机器（例如32 节点）。这么大规模的并行常常花费更多的测试时间（尤其是这种情况，你的测试可能运行在一些限制 cup 共享的容器中：你实际上无法完全使用 32 个核）。要在持续集成中使用并行，更好的方式是使用`-nodes`提供一个显式的并行节点数。
 
-### Sample .travis.yml
+### .travis.yml 的案例
 
-For Travis CI, you could use something like this:
+对于 Travis 持续集成，你可能使用类似下面的东西：
 
     language: go
     go:
@@ -1853,26 +1842,25 @@ For Travis CI, you could use something like this:
 
     script: ginkgo -r --randomizeAllSpecs --randomizeSuites --failOnPending --cover --trace --race --compilers=2
 
-Note that we've added `--compilers=2` -- this resolves an issue where Travis kills the Ginkgo process early for being too greedy.  By default, Ginkgo will run `runtime.NumCPU()` compilers which, on Travis, can be as many as `32` compilers!  Similarly, if you want to run your tests in parallel on Travis, make sure to specify `--nodes=N` instead of `-p`.
+注意，我们添加了  `--compilers=2` 。这解决了一个问题，即 Travis 会在 Ginkgo 请求过多的时候终止进程。默认地，Ginkgo 会运行 `runtime.NumCPU()`  个编译器，对应在 Travis 就是 32 个编译器。类似的，如果你在 Travis 上运行并行测试，确保指定  `--nodes=N`  而不是 `-p`。
+
 
 ---
 
-## Extensions
+## 插件
 
-Ginkgo ships with extensions to the core DSL.  These can be (optionally) dot imported to augment Ginkgo's default DSL.
 
-Currently there is only one extension: the table extension.
+Ginkgo 装载了核心 DSL(Domain Specific Language  领域专属语言) 的插件。可以通过点导入来增加 Ginkgo 的默认 DSL。当前只有一个扩展：表格插件。
 
-### Table Driven Tests
+### 表格驱动测试
 
-The [table](https://godoc.org/github.com/onsi/ginkgo/extensions/table) provides an expressive DSL for writing table driven tests.
+ [表格](https://godoc.org/github.com/onsi/ginkgo/extensions/table) 为写表格驱动测试提供了富有表现力的 DSL 。
 
-| Attention: if you have ginkgo in your `vendor` directory, be sure to add the package `github.com/onsi/ginkgo/extensions/table` to `vendor`. See [issue 234](https://github.com/onsi/ginkgo/issues/234#issuecomment-196645747) for details. |
-| :-------------------- |
+| 注意：如果你`vendor`目录中有 Ginkgo，确保添加包`github.com/onsi/ginkgo/extensions/table` 到 `vendor`。详情请看 [issue 234](https://github.com/onsi/ginkgo/issues/234#issuecomment-196645747)| | :——————– |
 
-While it's easy to roll your own table driven tests using simple data structures and a for loop, this layer of DSL makes it particularly easy to write and manage table driven tests.
+使用数据结构和 for 循环写你自己的表格驱动测试是简单的，DSL 层使书写和管理表格驱动测试变得尤其简单。
 
-For example:
+例如：
 
 ```go
 package table_test
@@ -1896,17 +1884,18 @@ var _ = Describe("Math", func() {
 })
 ```
 
-> In this example we dot import the table extension.  This isn't strictly necessary but makes the DSL easier to interact with.
+> 这个例子中，我们点导入的 table 插件。这不是必须的，但这样使 DSL 更容易交互。
 
-Let's break this down `DescribeTable` takes a description, a function to run for each test case, and a set of table entries.
+我们分析下， `DescribeTable` 带有一个描述 ， 一个运行每个测试的函数，还有一个 entry 集合。
 
-The function you pass in to `DescribeTable` can accept arbitrary arguments.  The parameters passed in to the individual `Entry` calls will be passed in to the function (type mismatches will result in a runtime panic).
+传入`DescribeTable`的函数可以接收任意参数。这些参数被传入每个 `Entry`的参数会被传入函数（类型不匹配的话，会导致运行时 panic ）
 
-The indiviudal `Entry` calls construct a `TableEntry` that is passed into `DescribeTable`.  A `TableEntry` consists of a description (the first call to `Entry`) and an arbitrary set of parameters to be passed into the function registered with `DescribeTable`.
 
-It's important to understand the life-cycle of the table.  The `table` package is a thin wrapper around Ginkgo's DSL.  `DescribeTable` generates a single Ginkgo `Describe`, within this `Describe` each `Entry` generates a Ginkgo `It`.  This all happens *before* the tests run (at "testing tree construction time").  The result is that the table expands into a number of `It`s (one for each `Entry`) that are subject to all of Ginkgo's test-running semantics: `It`s can be randomized and parallelized across multiple nodes.
+每个 `Entry` 构建一个  `TableEntry` 传入 `DescribeTable`。`TableEntry` 的组成元素是：一个描述（ `Entry` 的第一个调用），一个`DescribeTable` 注册被传入函数的任意参数集。
 
-To be clear, the above test is *exactly* equivalent to:
+理解表格的生命周期很重要。 `table` 包简单包装了 Ginkgo 的 DSL。`DescribeTable` 生成了单个 Ginkgo `Describe`， `Describe` 中 每个 `Entry` 生成一个 Ginkgo `It`。这都在测试运行前发生（在"构建测试树的时候"）。结果就是，表格发展了一定数量的 `It`（每个 `Entry` 一个），它们都服从所有 Ginkgo 测试运行的语义：`It` 在多节点间可以被随机化和并行化。
+
+需要明确的是，上述测试*完全*等同于：
 
 ```go
 package table_test
@@ -1933,18 +1922,18 @@ var _ = Describe("Math", func() {
 })
 ```
 
-You should be aware of the Ginkgo test lifecycle - particularly around [dynamically generating tests](#patterns-for-dynamically-generating-tests) - when using `DescribeTable`.
+你应该知道了 Ginkgo 的测试生命周期，尤其通过 [动态生成测试](#动态生成测试)和使用`DescribeTable`。
 
-#### Focusing and Pending Tables and Entries
+#### 聚焦并待定表格和Entry
 
-Here's the cool part.  Entire tables can be focused or marked pending by simply swapping out `DescribeTable` with `FDescribeTable` (to focus) or `PDescribeTable` (to mark pending).
+这是很棒的部分。整个表格都可以被聚焦或标记为怪气通过简单的将`DescribeTable` 置换为 `FDescribeTable`
+（聚焦） 或 `PDescribeTable` （待定）。
 
-Similarly, individual entries can be focused/pended out with `FEntry` and `PEntry`.  This is particularly useful when debugging tests.
+类似的，单个 entry 可以使用 `FEntry` and `PEntry` 被聚焦或待定。调试测试的时候这尤其有用。
 
-#### Managing Complex Parameters
+#### 管理复杂的参数
 
-While passing arbitrary parameters to `Entry` is convenient it can make the test cases difficult to parse at a glance.  For more complex tables it may make more sense to define a new type and pass it around instead.  For example:
-
+当你传递任意参数到 `Entry` 的时候，很容易就使得测试例子变得难以理解。对于更复杂的表，更合理的方式是，定义一个新的类型来传递。例如：
 ```go
 package table_test
 
@@ -1985,14 +1974,11 @@ var _ = Describe("Substring matching", func() {
 })
 ```
 
-Note that this pattern uses the same DSL, it's simply a way to manage the parameters flowing between the `Entry` cases and the callback registered with `DescribeTable`.
+注意，这个模式使用了相同的 DSL，这是一个简单的方法来管理 `Entry` 间的参数流和`DescribeTable` 注册的回调函数。
 
-#### Custom Entry Description
+#### 自定义 Entry 描述
 
-There are some scenarios where having the parameters as part of the description helps in understanding what a given test is about.
-Instead of needing to add the parameters to each different description, `Entry` support passing it a helper function that will be fed with the `Entry` parameters and should return a description related to those parameters.
-
-For example:
+有一些场景，描述中的一部分是参数，这样有助于理解测试的意图。`Entry`支持传递一个接收`Entry`参数并返回相关描述的帮助函数，而不是在每个描述中添加参数。例如：
 
 ```go
 package table_test
@@ -2022,15 +2008,15 @@ var _ = Describe("TableWithParametricDescription", func() {
 
 ```
 
-In this case, the description of each `It` the entries are translated to is generated by the `describe` function passed to each `Entry`.
+这个例子中，`Entry` 中每个 `It` 的描述都是通过传入 `Entry` 的 `describe`函数生成的。
 
 ---
 
-## Writing Custom Reporters
+## 编写自定义报告器
 
-While Ginkgo's default reporter offers a comprehensive set of features, Ginkgo makes it easy to write and run multiple custom reporters at once.  There are many usecases for this - you might implement a custom reporter to support a special output format for your CI setup, or you might implement a custom reporter to [aggregate data](#measuring-time) from Ginkgo's `Measure` nodes and produce HTML or CSV reports (or even plots!)
+因为 Ginkgo 的默认报告器提供了全面的功能， Ginkgo 很容易同时写和运行多个自定义报告器。这有很多使用案例。你能实现一个自定义报告器使你的持续集成方案支持一个特殊的输出格式，或者你能实现一个自定义报告器从Ginkgo `Measure` 节点[聚合数据](#measuring-time) 和制造 HTML 或 CSV 报告（或者甚至图表！）。
 
-In Ginkgo a reporter must satisfy the `Reporter` interface:
+在 Ginkgo 中，一个报告器必须满足 `Reporter` 接口：
 
 ```go
 type Reporter interface {
@@ -2043,35 +2029,37 @@ type Reporter interface {
 }
 ```
 
-The method names should be self-explanatory.  Be sure to dig into the `SuiteSummary` and `SpecSummary` objects to get a sense of what data is available to your reporter.  If you're writing a custom reporter to ingest benchmarking data generated by `Measure` nodes you'll want to look at the `ExampleMeasurement` struct that is provided by `ExampleSummary.Measurements`.
+方法的名字应该能是自解释的。为了使你获得合理可用的数据，确保深入理解  `SuiteSummary` 和 `SpecSummary` 。如果你写了一个自定义报告器，用于获取 `Measure` 节点产生的基准测试数据，你会想看看  `ExampleSummary.Measurements` 提供的结构体 `ExampleMeasurement` 。
 
-Once you've created your custom reporter you may pass an instance of it to Ginkgo by replacing the `RunSpecs` command in your test suite bootstrap with either:
+
+一旦你创建了自定义报告器，你可能要替换你测试套件中的`RunSpecs`命令，来传入该实例到 Ginkgo，要么这样：
 
 ```go
 RunSpecsWithDefaultAndCustomReporters(t *testing.T, description string, reporters []Reporter)
 ```
 
-or
+要么这样
 
 ```go
 RunSpecsWithCustomReporters(t *testing.T, description string, reporters []Reporter)
 ```
 
-`RunSpecsWithDefaultAndCustomReporters` will run your custom reporters alongside Ginkgo's default reporter.  `RunSpecsWithCustomReporters` will only run the custom reporters you pass in.
+`RunSpecsWithDefaultAndCustomReporters` 会运行你的自定义报告器和 Ginkgo 默认报告器。`RunSpecsWithCustomReporters` 只会运行你的自定义报告器。
 
-If you wish to run your tests in parallel you should not use `RunSpecsWithCustomReporters` as the default reporter plays an important role in streaming test output to the ginkgo CLI.
+如果你希望运行并行测试，你不应该使用 `RunSpecsWithCustomReporters`，因为默认报告器是 ginkgo CLI 测试输出流的重要角色。
 
 ---
+## 第三方集成
 
-## Third Party Integrations
+### 使用其它匹配库
 
-### Using Other Matcher Libraries
+大多数匹配库接受  `*testing.T`  对像。不幸的是，这是个具体类型 ，因此难以和 Ginkgo 兼容。
 
-Most matcher library accept the `*testing.T` object.  Unfortunately, since this is a concrete type is can be tricky to pass in an equivalent that will work with Ginkgo.
-
-It is, typically, not difficult to replace `*testing.T` in such libraries with an interface that `*testing.T` satisfies.  For example [testify](https://github.com/stretchr/testify) accepts `t` via an interface.  In such cases you can pass `GinkgoT()`.  This generates an object that mimics `*testing.T` and communicates to Ginkgo directly.
+通常，用满足  `*testing.T` 的接口替换此类库中的  `*testing.T` 并不困难。例如[testify](https://github.com/stretchr/testify) ，通过接口接收 `t`。这种情况下你可以传递  `GinkgoT()`。这将产生一个模仿  `*testing.T` 的对像，并且能直接和 Ginkgo 通信。
 
 For example, to get testify working:
+
+例如，这样使用 testify ：
 
 ```go
 package foo_test
@@ -2089,13 +2077,13 @@ var _ = Describe(func("foo") {
 })
 ```
 
-> Note that passing the `*testing.T` from Ginkgo's bootstrap `Test...()` function will cause the suite to abort as soon as the first failure is encountered.  Don't do this.  You need to communicate failure to Ginkgo's single (global) `Fail` function
+> 注意，从 传递来自 Ginkgo 的引导函数  `Test...()`  的 `*testing.T` 的话，会导致套件遇到第一个测试失败时停止。不要这样做。你需要将失败传递给 Ginkgo 的单个（全局） `Fail`  函数。
 
-### Integrating with Gomock
+### 集成 Gomock
 
-Ginkgo does not provide a mocking/stubbing framework.  It's the author's opinion that mocks and stubs can be avoided completely by embracing dependency injection and always injecting Go interfaces.  Real dependencies are then injected in production code, and fake dependencies are injected under test.  Building and maintaining such fakes tends to be straightforward and can allow for clearer and more expressive tests than mocks.
+Ginkgo 没有提供模拟/桩（ mocking/stubbing）框架。作者认为，mocks 和 stub 能完全被依赖注入和注入 Go 接口来替代。然后，将实际依赖注入到生产代码中，并在测试代码中注入伪造的依赖。建立和维护此类伪造品往往很简单，并且可以比模拟进行更清晰，更具表现力的测试。
 
-With that said, it is relatively straightforward to use a mocking framework such as [Gomock](https://code.google.com/p/gomock/).  `GinkgoT()` implements Gomock's `TestReporter` interface.  Here's how you use it (for example):
+话虽如此，使用诸如[Gomock](https://code.google.com/p/gomock/) 之类的模拟框架相对简单。`GinkgoT()`  实现了 Gomock 的 `TestReporter` 的接口。使用方法如下（举例）：
 
 ```go
 import (
@@ -2129,11 +2117,13 @@ var _ = Describe("Consumer", func() {
 })
 ```
 
-When using Gomock you may want to run `ginkgo` with the `-trace` flag to print out stack traces for failures which will help you trace down where, in your code, invalid calls occured.
+当使用 Gomock时，你可能想要使用 `-trace` 参数运行 `ginkgo`，以打印失败的堆栈跟踪信息，这将帮你追溯代码中无效调用的发生位置。
 
-### Generating JUnit XML Output
+### 生成 JUnit XML 的输出。
 
-Ginkgo provides a [custom reporter](#writing-custom-reporters) for generating JUnit compatible XML output.  Here's a sample bootstrap file that instantiates a JUnit reporter and passes it to the test runner:
+Ginkgo 提供了一个 [自定义报告器](https://onsi.github.io/ginkgo/#writing-custom-reporters) 来生成 JUnit 兼容的 XML 输出。这是一个示例引导文件，该文件实例化了JUnit报告程序并将其传递给测试运行器：
+
+
 
 ```go
 package foo_test
@@ -2153,10 +2143,10 @@ func TestFoo(t *testing.T) {
 }
 ```
 
-This will generate a file name "junit.xml" in the directory containing your test.  This xml file is compatible with the latest version of the Jenkins JUnit plugin.
+这会在包含你测试的目录中生成一个名为 “junit.xml” 的文件。这个 xml 文件兼容最新版本的 Jenkins JUnit 插件。
 
-If you want to run your tests in parallel you'll need to make your JUnit xml filename a function of the parallel node number.  You can do this like so:
+如果你想要并行运行你的测试，你需要让你的 JUnit xml 文件带有并行节点号。你可以这样做：
 
     junitReporter := reporters.NewJUnitReporter(fmt.Sprintf("junit_%d.xml", config.GinkgoConfig.ParallelNode))
 
-Note that you'll need to import `fmt` and `github.com/onsi/ginkgo/config` to get this to work.  This will generate an xml file for each parallel node.  The Jenkins JUnit plugin (for example) automatically aggregates data from across all these files.
+注意，你需要导入 `fmt` 和  `github.com/onsi/ginkgo/config` ，以使其正常工作。这会为每个并行节点生成一个 xml 文件。 Jenkins JUnit 插件（举例） 会自动聚合所有这些文件的数据。
