@@ -71,7 +71,7 @@ func TestBooks(t *testing.T) {
 
 我们来分析上述代码：
 
-- Go 允许我们在  `books` 包中声明 `books_test` 包。使用 `books_test` 替代 `books` 允许我们遵守 `books` 包的封装性：你的测试将要导入 `books` 并且从外部使用它，就像其他包一样。当让，如果你想要进入包内部来测试它内部组件并进行跟多行为测试的话，你可以选择将 `package books_test`  换成 `package books` 。
+- Go 允许我们在  `books` 包中声明 `books_test` 包。使用 `books_test` 替代 `books` 允许我们遵守 `books` 包的封装性：你的测试将要导入 `books` 并且从外部使用它，就像其他包一样。当然，如果你想要进入包内部来测试它内部组件并进行跟多行为测试的话，你可以选择将 `package books_test`  换成 `package books` 。
 - 我们使用 dot-import 将 `ginkgo` 和 `gomega` 包导入到了顶级命名空间。如果你不想这样做的话，查看下面的 [避免 Dot Imports](#avoiding-dot-imports) 。
 - `TestBooks`  是一个 `testing` 测试.你运行 `go test`  或 `ginkgo` 的时候 Go 测试执行器会执行这个函数。
 - `RegisterFailHandler(Fail)` ： 一个 Ginkgo 测试调用 Ginkgo 的  `Fail(description string)` 函数发出失败信号。我们使用`RegisterFailHandler` 将这个函数传给 Gomega 。这是 Ginkgo 和 Gomega 唯一的连接点。
@@ -817,7 +817,7 @@ Ginkgo 致力于谨慎地控制 specs 的运行顺序，并且对运行中 [多�
 
 这意味着所有这些测试必须在 Ginkgo 运行套件*前*都定义好。因为在套件运行的时候，尝试定义一个新的测试会出现错误（例如在 `It` 块中调用 `It`）。
 
-当让，根据配置动态生成测试套件也是可行的（实际上经常这样）。但是 Ginkgo 生命周期中你必须*在正确的时间*生成测试。这些细微差别有时候让用户犯错。
+当然，根据配置动态生成测试套件也是可行的（实际上经常这样）。但是 Ginkgo 生命周期中你必须*在正确的时间*生成测试。这些细微差别有时候让用户犯错。
 
 我们来卡一下典型的 Ginkgo 测试套件。跟在测试套件后面的是一个多文件的 books 包：
 
